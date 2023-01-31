@@ -1,42 +1,46 @@
 package io.qmbot.aoc.y2022;
 
+import io.qmbot.aoc.Puzzle;
+
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class Day01 {
+public class Day01 implements Puzzle {
     private static String PATH = "C:\\Users\\arina\\IdeaProjects\\untitled2\\src\\main\\resources\\2022_1.txt";
 
     public static void main(String[] args) throws IOException {
-        List<String> allCalories = Files.lines(Paths.get(PATH)).collect(Collectors.toList());
-        System.out.println(part1(allCalories));
-        System.out.println(part2(allCalories));
+        Puzzle puzzle = new Day01();
+        String input = Files.readString(Paths.get(PATH));
+        System.out.println(puzzle.part1(input));
+        System.out.println(puzzle.part2(input));
     }
-
-    private static String part1(List<String> allCalories) {
-        int elv1 = 0;
+    @Override
+    public String part1(String input) {
+        int elvCaloriesMax = 0;
         int elv = 0;
-        for (String line : allCalories) {
+        for (String line : input.lines().toList()) {
             if (line.isEmpty()) {
-                if (elv > elv1) {
-                    elv1 = elv;
+                if (elv > elvCaloriesMax) {
+                    elvCaloriesMax = elv;
                 }
                 elv = 0;
             } else {
                 elv = elv + Integer.parseInt(line);
             }
         }
-        return Integer.toString(elv1);
+        return Integer.toString(elvCaloriesMax);
     }
 
-    private static String part2(List<String> allCalories) {
+    @Override
+    public String part2(String input) {
         int elv1 = 0;
         int elv2 = 0;
         int elv3 = 0;
         int elv = 0;
-        for (String line : allCalories) {
+        for (String line : input.lines().toList()) {
             if (line.isEmpty()) {
                 if (elv > elv1) {
                     elv3 = elv2;
