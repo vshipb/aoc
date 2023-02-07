@@ -1,7 +1,6 @@
 package io.qmbot.aoc.y2022;
 
 import io.qmbot.aoc.Puzzle;
-
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
@@ -15,10 +14,11 @@ public class Day02 implements Puzzle {
         System.out.println(puzzle.part1(lines));
         System.out.println(puzzle.part2(lines));
     }
+
     @Override
     public String part1(String input) {
         int count = 0;
-        for(String round : input.split("\r\n")){
+        for (String round : input.split("\r\n")) {
             if (round.contains("X")) {
                 count++;
             }
@@ -41,7 +41,7 @@ public class Day02 implements Puzzle {
     @Override
     public String part2(String input) {
         int count = 0;
-        for(String round : input.split("\r\n")){
+        for (String round : input.split("\r\n")) {
             if (round.contains("Y")) {
                 count = count + 3;
             }
