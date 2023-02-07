@@ -15,6 +15,7 @@ public class Day01 implements Puzzle {
         System.out.println(puzzle.part1(input));
         System.out.println(puzzle.part2(input));
     }
+
     @Override
     public String part1(String input) {
         return Long.toString(Arrays.stream(input.split("\r\n\r\n"))
