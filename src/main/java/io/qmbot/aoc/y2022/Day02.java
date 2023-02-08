@@ -18,7 +18,7 @@ public class Day02 implements Puzzle {
     @Override
     public String part1(String input) {
         int count = 0;
-        for (String round : input.split("\r\n")) {
+        for (String round : input.split("\n")) {
             if (round.contains("X")) {
                 count++;
             }
@@ -41,7 +41,7 @@ public class Day02 implements Puzzle {
     @Override
     public String part2(String input) {
         int count = 0;
-        for (String round : input.split("\r\n")) {
+        for (String round : input.split("\n")) {
             if (round.contains("Y")) {
                 count = count + 3;
             }
