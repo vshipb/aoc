@@ -18,14 +18,14 @@ public class Day01 implements Puzzle {
 
     @Override
     public String part1(String input) {
-        return Long.toString(Arrays.stream(input.split("\r\n\r\n"))
+        return Long.toString(Arrays.stream(input.split("\n\n"))
                 .mapToLong(s -> s.lines().mapToLong(Long::parseLong).sum())
                 .max().orElseThrow());
     }
 
     @Override
     public String part2(String input) {
-        long[] sort = Arrays.stream(input.split("\r\n\r\n"))
+        long[] sort = Arrays.stream(input.split("\n\n"))
                 .mapToLong(s -> s.lines().mapToLong(Long::parseLong).sum())
                 .sorted().toArray();
         int length = sort.length;
