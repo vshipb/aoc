@@ -19,7 +19,7 @@ public class Day03 implements Puzzle {
     public String part1(String input) {
         int sum = 0;
 
-        for (String string : input.split("\r\n")) {
+        for (String string : input.split("\n")) {
             sum = sum + priority(sameItems(string));
         }
         return String.valueOf(sum);
@@ -28,7 +28,7 @@ public class Day03 implements Puzzle {
     @Override
     public String part2(String input) {
         int sum = 0;
-        String[] strings = input.split("\r\n");
+        String[] strings = input.split("\n");
         for (int i = 0; i < strings.length; i = i + 3) {
             sum = sum + priority(sameItems2(strings[i], strings[i + 1], strings[i + 2]));
         }
