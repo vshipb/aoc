@@ -1,6 +1,7 @@
 package io.qmbot.aoc.y2022;
 
 import io.qmbot.aoc.Puzzle;
+
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
@@ -21,7 +22,7 @@ public class Day05 implements Puzzle {
     public String part1(String input) {
         String[] splitted = input.split("\n\n");
         List<String> strings = splitted[0].lines().toList();
-        String str = strings.get(strings.size()-1);
+        String str = strings.get(strings.size() - 1);
         int stacks = Character.getNumericValue(str.charAt(str.length() - 2));
         LinkedList<Character>[] l = new LinkedList[stacks];
         for (int i = 0; i < stacks; i++) {
@@ -36,7 +37,7 @@ public class Day05 implements Puzzle {
             }
         }
         List<String> moves = splitted[1].lines().toList();
-        for (String move : moves){
+        for (String move : moves) {
             moving(l, move);
         }
         String result = "";
@@ -50,7 +51,7 @@ public class Day05 implements Puzzle {
     public String part2(String input) {
         String[] splitted = input.split("\n\n");
         List<String> strings = splitted[0].lines().toList();
-        String str = strings.get(strings.size()-1);
+        String str = strings.get(strings.size() - 1);
         int stacks = Character.getNumericValue(str.charAt(str.length() - 2));
         LinkedList<Character>[] l = new LinkedList[stacks];
         for (int i = 0; i < stacks; i++) {
@@ -65,7 +66,7 @@ public class Day05 implements Puzzle {
             }
         }
         List<String> moves = splitted[1].lines().toList();
-        for (String move : moves){
+        for (String move : moves) {
             moving9001(l, move);
         }
         String result = "";
@@ -78,18 +79,19 @@ public class Day05 implements Puzzle {
     private static void moving(LinkedList[] lines, String move1) {
         String[] move3 = move1.split(" ");
         int move = Integer.parseInt(move3[1]);
-        int from = Integer.parseInt(move3[3])-1;
-        int to = Integer.parseInt(move3[5])-1;
+        int from = Integer.parseInt(move3[3]) - 1;
+        int to = Integer.parseInt(move3[5]) - 1;
         for (int i = 0; i < move; i++) {
             lines[to].push(lines[from].pop());
         }
     }
+
     private static void moving9001(LinkedList<Character>[] lines, String move1) {
         String[] move3 = move1.split(" ");
         LinkedList<Character> reserve = new LinkedList<>();
         int move = Integer.parseInt(move3[1]);
-        int from = Integer.parseInt(move3[3])-1;
-        int to = Integer.parseInt(move3[5])-1;
+        int from = Integer.parseInt(move3[3]) - 1;
+        int to = Integer.parseInt(move3[5]) - 1;
         for (int i = 0; i < move; i++) {
             reserve.push(lines[from].pop());
         }

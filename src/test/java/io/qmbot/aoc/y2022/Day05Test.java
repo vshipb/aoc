@@ -18,12 +18,12 @@ public class Day05Test {
             "move 1 from 1 to 2";
 
     @Test
-    public void test1(){
+    public void test1() {
         Assertions.assertEquals("CMZ", p.part1(input));
     }
 
     @Test
-    public void test2(){
+    public void test2() {
         Assertions.assertEquals("MCD", p.part2(input));
     }
 }
