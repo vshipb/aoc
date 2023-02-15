@@ -1,7 +1,6 @@
 package io.qmbot.aoc.y2022;
 
 import io.qmbot.aoc.Puzzle;
-
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
