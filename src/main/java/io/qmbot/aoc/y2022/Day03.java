@@ -6,15 +6,6 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 
 public class Day03 implements Puzzle {
-    private static final String PATH = "C:\\Users\\arina\\IdeaProjects\\untitled2\\src\\main\\resources\\22_3.txt";
-
-    public static void main(String[] args) throws IOException {
-        Puzzle puzzle = new Day03();
-        String input = Files.readString(Paths.get(PATH));
-        System.out.println(puzzle.part1(input));
-        System.out.println(puzzle.part2(input));
-    }
-
     @Override
     public String part1(String input) {
         int sum = 0;
