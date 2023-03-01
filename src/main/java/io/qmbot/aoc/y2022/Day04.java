@@ -1,19 +1,8 @@
 package io.qmbot.aoc.y2022;
 
 import io.qmbot.aoc.Puzzle;
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Paths;
 
 public class Day04 implements Puzzle {
-    private static String PATH = "C:\\Users\\arina\\IdeaProjects\\untitled2\\src\\main\\resources\\22_4.txt";
-
-    public static void main(String[] args) throws IOException {
-        Puzzle puzzle = new Day04();
-        String input = Files.readString(Paths.get(PATH));
-        System.out.println(puzzle.part1(input));
-        System.out.println(puzzle.part2(input));
-    }
 
     @Override
     public String part1(String input) {
