@@ -21,8 +21,8 @@ public class Day05 implements Puzzle {
     public String part1(String input) {
         String[] splitted = input.split("\n\n");
         List<String> strings = splitted[0].lines().toList();
-        String str = strings.get(strings.size() - 1);
-        int stacks = Character.getNumericValue(str.charAt(str.length() - 2));
+        String str = strings.get(strings.size() - 1).replaceAll(" ", "");
+        int stacks = Character.getNumericValue(str.charAt(str.length() - 1));
         LinkedList<Character>[] l = new LinkedList[stacks];
         for (int i = 0; i < stacks; i++) {
             l[i] = new LinkedList<>();
@@ -50,8 +50,8 @@ public class Day05 implements Puzzle {
     public String part2(String input) {
         String[] splitted = input.split("\n\n");
         List<String> strings = splitted[0].lines().toList();
-        String str = strings.get(strings.size() - 1);
-        int stacks = Character.getNumericValue(str.charAt(str.length() - 2));
+        String str = strings.get(strings.size() - 1).replaceAll(" ", "");
+        int stacks = Character.getNumericValue(str.charAt(str.length() - 1));
         LinkedList<Character>[] l = new LinkedList[stacks];
         for (int i = 0; i < stacks; i++) {
             l[i] = new LinkedList<>();

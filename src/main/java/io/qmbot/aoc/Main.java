@@ -1,9 +1,10 @@
 package io.qmbot.aoc;
 
+import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.nio.file.Files;
-import java.nio.file.Paths;
+import java.nio.file.Path;
 
 public class Main {
     public static void main(String[] args) throws ClassNotFoundException, NoSuchMethodException, IOException,
@@ -12,8 +13,11 @@ public class Main {
             String formatted = String.format("io.qmbot.aoc.y2022.Day%02d", i);
             Class cls = Class.forName(formatted);
             Puzzle p = (Puzzle) cls.getDeclaredConstructor().newInstance();
-            String path = "C:\\Users\\arina\\IdeaProjects\\untitled2\\src\\main\\resources\\22_" + i + ".txt";
-            String input = Files.readString(Paths.get(path));
+
+            ClassLoader classLoader = Main.class.getClassLoader();
+            File file = new File(classLoader.getResource("ArinaResources/22_" + i + ".txt").getFile());
+
+            String input = Files.readString(Path.of(file.getPath()));
             System.out.println("Day " + i + " answer");
             System.out.println(p.part1(input));
             System.out.println(p.part2(input));
