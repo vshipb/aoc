@@ -26,7 +26,7 @@ public class Day09Test {
 
     @Test
     public void part1(){
-        Assertions.assertEquals("1", p.part1(input));
+        Assertions.assertEquals("13", p.part1(input));
     }
 
     @Test
