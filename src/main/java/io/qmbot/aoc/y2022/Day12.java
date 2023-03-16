@@ -118,7 +118,7 @@ public class Day12 implements Puzzle {
                     field1[neighbor.y][neighbor.x] = field1[point.y][point.x] + 1;
                     newPoints.add(neighbor);
                     if (field[neighbor.y][neighbor.x] == 'a') {
-                        newPoints.removeAll(newPoints);
+                        newPoints.clear();
                         newPoints.add(neighbor);
                         return newPoints;
                     }
