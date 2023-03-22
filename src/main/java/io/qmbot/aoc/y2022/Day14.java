@@ -1,7 +1,6 @@
 package io.qmbot.aoc.y2022;
 
 import io.qmbot.aoc.Puzzle;
-
 import java.util.ArrayList;
 import java.util.List;
 
