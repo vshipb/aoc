@@ -1,6 +1,7 @@
 package io.qmbot.aoc.y2022;
 
 import io.qmbot.aoc.Puzzle;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -32,16 +33,14 @@ public class Day14 implements Puzzle {
         }
         int countOfSend = 0;
 
-        try {
-            while (field[0][startFallX] == 0) {
-                fall(field, startFallX);
-            }
-        } catch (ArrayIndexOutOfBoundsException e) {
-            for (int[] ints : field) {
-                for (int j = 0; j < field[1].length; j++) {
-                    if (ints[j] == 1) {
-                        countOfSend++;
-                    }
+        while (field[0][startFallX] == 0) {
+            fall(field, startFallX);
+        }
+
+        for (int[] ints : field) {
+            for (int j = 0; j < field[1].length; j++) {
+                if (ints[j] == 1) {
+                    countOfSend++;
                 }
             }
         }
@@ -71,6 +70,7 @@ public class Day14 implements Puzzle {
         for (int i = 0; i < field[0].length; i++) {
             field[field.length - 1][i] = 2;
         }
+
         int countOfSend = 0;
         while (field[0][startFallX] == 0) {
             fall(field, startFallX);
@@ -131,25 +131,34 @@ public class Day14 implements Puzzle {
 
     private static void fall(int[][] field, int x) {
         int y = 0;
-        if (field[y + 1][x] == 1
-                && field[y + 1][x - 1] == 1
-                && field[y + 1][x + 1] == 1) {
+        int checkY = y + 1;
+        int startX = x;
+        if (field[checkY][x] == 1
+                && field[checkY][x - 1] == 1
+                && field[checkY][x + 1] == 1) {
             field[y][x] = 1;
         }
         while (field[y + 1][x] == 0
-                || field[y + 1][x - 1] == 0
-                || field[y + 1][x + 1] == 0) {
+                || field[checkY][x - 1] == 0
+                || field[checkY][x + 1] == 0) {
             field[y][x] = 0;
-            if (field[y + 1][x] == 0) {
+            if (field[checkY][x] == 0) {
                 y++;
-            } else if (field[y + 1][x - 1] == 0) {
+            } else if (field[checkY][x - 1] == 0) {
                 y++;
                 x--;
-            } else if (field[y + 1][x + 1] == 0) {
+            } else if (field[checkY][x + 1] == 0) {
                 y++;
                 x++;
             }
+            if (checkY == y) checkY++;
+
             field[y][x] = 1;
+
+            if (y == field.length - 1) {
+                field[0][startX] = 2;
+                return;
+            }
         }
 
     }
