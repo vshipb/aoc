@@ -4,7 +4,6 @@ import io.qmbot.aoc.Puzzle;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.concurrent.atomic.AtomicInteger;
 
 public class Day17 implements Puzzle {
     @Override
@@ -14,13 +13,13 @@ public class Day17 implements Puzzle {
         fullField(field);
 
         int startDirection = 0;
-        AtomicInteger start = new AtomicInteger(field.length - 5);
+        int start = field.length - 5;
         int indexF = 0;
 
         for (int i = 0; i < 2022; i++) {
             for (String[] string : field) {
                 if (Arrays.asList(string).contains("7")) {
-                    start.set(Arrays.asList(field).indexOf(string) - 4);
+                    start = Arrays.asList(field).indexOf(string) - 4;
                     break;
                 }
             }
@@ -51,7 +50,7 @@ public class Day17 implements Puzzle {
         fullField(field);
 
         int startDirection = 0;
-        AtomicInteger start = new AtomicInteger(field.length - 5);
+        int start = field.length - 5;
         int indexF = 0;
 
         for (long numberF = 0; numberF < 1_000_000_000L; numberF++) {
@@ -60,11 +59,11 @@ public class Day17 implements Puzzle {
                 if (Arrays.asList(field[i]).contains("7")) {
 
                     if (i == 30 || i == 31 || i == 32) {
-                        g = g + deleteBlocks(i, field, highField, start);
+                        g = g + deleteBlocks(i, field, highField);
                         break;
                     }
 
-                    start.set(Arrays.asList(field).indexOf(field[i]) - 4);
+                    start = Arrays.asList(field).indexOf(field[i]) - 4;
                     break;
                 }
             }
@@ -88,9 +87,8 @@ public class Day17 implements Puzzle {
 
     }
 
-    private Figure createFigure(int indexF, AtomicInteger atomStart) {
-        int start = atomStart.get();
-        Figure figure = new Figure();
+    private Figure createFigure(int indexF, int start) {
+        Figure figure;
 
         switch (indexF) {
             case 0 -> figure = horizontal(start);
@@ -98,7 +96,7 @@ public class Day17 implements Puzzle {
             case 2 -> figure = angle(start);
             case 3 -> figure = vertical(start);
             case 4 -> figure = square(start);
-            default -> System.out.println("Недопустимое значение");
+            default -> throw new IllegalArgumentException("Figure index " + indexF + " is not valid");
         }
 
         return figure;
@@ -118,7 +116,7 @@ public class Day17 implements Puzzle {
         }
     }
 
-    static long deleteBlocks(int i, String[][] field, int highField, AtomicInteger start) {
+    static long deleteBlocks(int i, String[][] field, int highField) {
         int max = highField - 2;
         int min = max - i;
         int change = i;
@@ -131,9 +129,7 @@ public class Day17 implements Puzzle {
                 field[y][x] = "0";
             }
         }
-        long move = min - i;
-        start.set(min - 4);
-        return move;
+        return min - i;
     }
 
     static class Point {
@@ -200,7 +196,8 @@ public class Day17 implements Puzzle {
                             }
                         }
                     }
-                    default -> System.out.println("Недопустимое значение");
+                    default -> throw new IllegalArgumentException("Figure index "
+                            + direction.charAt(startDirection) + " is not valid");
                 }
                 startDirection++;
                 if (startDirection == direction.length()) startDirection = 0;
