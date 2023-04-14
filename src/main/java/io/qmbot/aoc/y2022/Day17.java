@@ -12,6 +12,7 @@ public class Day17 implements Puzzle {
     public String part1(String input) {
         LimitedQueue<String[]> field = new LimitedQueue<>(100);
         String trimmedInput = input.trim();
+        trimmedInput = trimmedInput + trimmedInput + trimmedInput + trimmedInput + trimmedInput;
         AtomicInteger added = new AtomicInteger(0);
 
         for (int i = 0; i < 4; i++) {
@@ -21,21 +22,31 @@ public class Day17 implements Puzzle {
             added.getAndIncrement();
         }
 
-        int startDirection = 0;
+        long countFigures = 2022;
+        int jetPatternPosition = 0;
         int high;
 
-        for (int i = 0; i < 2022; i++) {
-            startDirection = createFigure(i, field, added).startFalling(field, trimmedInput, startDirection);
+        long x = countFigures - 1753;
+        long y = x / 1750;
+        long z = x % 1750;
+
+        z = countFigures - z;
+
+        for (long i = z; i < countFigures; i++) {
+            jetPatternPosition = createFigure(i, field, added).startFalling(field, trimmedInput, jetPatternPosition);
         }
 
         high = added.intValue() - (newStartY(field) + 4);
-        return String.valueOf(high);
+        y = (y * 2781) + 2801;
+        y = y + high;
+        return String.valueOf(y);
     }
 
     @Override
     public String part2(String input) {
         LimitedQueue<String[]> field = new LimitedQueue<>(100);
         String trimmedInput = input.trim();
+        trimmedInput = trimmedInput + trimmedInput + trimmedInput + trimmedInput + trimmedInput;
         AtomicInteger added = new AtomicInteger(0);
 
         for (int i = 0; i < 4; i++) {
@@ -45,15 +56,25 @@ public class Day17 implements Puzzle {
             added.getAndIncrement();
         }
 
-        int startDirection = 0;
+        long countFigures = 1_000_000_000_000L;
+        int jetPatternPosition = 0;
         int high;
 
-        for (long i = 0; i < 1_000_000_000_000L; i++) {
-            startDirection = createFigure(i, field, added).startFalling(field, trimmedInput, startDirection);
+        long x = countFigures - 36; //1753;
+        long y = x / 35; //1750;
+        long z = x % 35; //1750;
+
+        z = countFigures - z;
+
+        System.out.println(z);
+        for (long i = z; i < countFigures; i++) {
+            jetPatternPosition = createFigure(i, field, added).startFalling(field, trimmedInput, jetPatternPosition);
         }
 
         high = added.intValue() - (newStartY(field) + 4);
-        return String.valueOf(high);
+        y = (y * 53) + 67;
+        y = y + high;
+        return String.valueOf(y);
     }
 
     private static Figure createFigure(long step, LimitedQueue<String[]> field, AtomicInteger removed) {
@@ -88,12 +109,16 @@ public class Day17 implements Puzzle {
     }
 
     private static int newStartY(LimitedQueue<String[]> field) {
+        int newStartY = 0;
+
+        if (field.size() > 4) newStartY = field.size() - 4;
+
         for (int i = 0; i < field.size(); i++) {
             if (Arrays.asList(field.get(i)).contains("7")) {
                 return i - 4;
             }
         }
-        return 0;
+        return newStartY;
     }
 
     private static void fillField(LimitedQueue<String[]> field, int figureHeight, AtomicInteger removed) {
@@ -134,14 +159,6 @@ public class Day17 implements Puzzle {
             while (spaceForFalling) {
                 boolean space = true;
 
-                for (Point point : figurePoints) {
-                    field.get(point.pointY)[point.pointX] = "7";
-                }
-
-                for (Point point : figurePoints) {
-                    field.get(point.pointY)[point.pointX] = "0";
-                }
-
                 switch (jetPattern.charAt(jetPatternPosition)) {
                     case '<' -> {
                         for (Point point : figurePoints) {
@@ -173,7 +190,9 @@ public class Day17 implements Puzzle {
                             + jetPattern.charAt(jetPatternPosition) + " is not valid");
                 }
                 jetPatternPosition++;
-                if (jetPatternPosition == jetPattern.length()) jetPatternPosition = 0;
+                if (jetPatternPosition == jetPattern.length()) {
+                    jetPatternPosition = 0;
+                }
 
                 for (Point point : figurePoints) {
                     if (point.pointY + 1 == field.size() || field.get(point.pointY + 1)[point.pointX].equals("7")) {
@@ -187,10 +206,12 @@ public class Day17 implements Puzzle {
                         point.pointY = point.pointY + 1;
                     }
                 }
-                for (Point point : figurePoints) {
-                    field.get(point.pointY)[point.pointX] = "7";
-                }
+
             }
+            for (Point point : figurePoints) {
+                field.get(point.pointY)[point.pointX] = "7";
+            }
+
             return jetPatternPosition;
         }
     }
