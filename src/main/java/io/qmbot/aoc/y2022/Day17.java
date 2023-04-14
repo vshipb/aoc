@@ -12,7 +12,6 @@ public class Day17 implements Puzzle {
     public String part1(String input) {
         LimitedQueue<String[]> field = new LimitedQueue<>(100);
         String trimmedInput = input.trim();
-        trimmedInput = trimmedInput + trimmedInput + trimmedInput + trimmedInput + trimmedInput;
         AtomicInteger added = new AtomicInteger(0);
 
         for (int i = 0; i < 4; i++) {
@@ -46,7 +45,6 @@ public class Day17 implements Puzzle {
     public String part2(String input) {
         LimitedQueue<String[]> field = new LimitedQueue<>(100);
         String trimmedInput = input.trim();
-        trimmedInput = trimmedInput + trimmedInput + trimmedInput + trimmedInput + trimmedInput;
         AtomicInteger added = new AtomicInteger(0);
 
         for (int i = 0; i < 4; i++) {
