@@ -25,9 +25,9 @@ public class Day17 implements Puzzle {
         int jetPatternPosition = 0;
         int high;
 
-        long x = countFigures - 1753;
-        long y = x / 1750;
-        long z = x % 1750;
+        long x = countFigures - 36;
+        long y = x / 35;
+        long z = x % 35;
 
         z = countFigures - z;
 
@@ -36,8 +36,8 @@ public class Day17 implements Puzzle {
         }
 
         high = added.intValue() - (newStartY(field) + 4);
-        y = (y * 2781) + 2801;
-        y = y + high;
+        y = (y * 53) + 64;
+        y = y + high ;
         return String.valueOf(y);
     }
 
@@ -107,19 +107,15 @@ public class Day17 implements Puzzle {
     }
 
     private static int newStartY(LimitedQueue<String[]> field) {
-        int newStartY = 0;
-
-        if (field.size() > 4) newStartY = field.size() - 4;
-
         for (int i = 0; i < field.size(); i++) {
             if (Arrays.asList(field.get(i)).contains("7")) {
                 return i - 4;
             }
         }
-        return newStartY;
+        return field.size() - 4;
     }
 
-    private static void fillField(LimitedQueue<String[]> field, int figureHeight, AtomicInteger removed) {
+    private static void fillField(LimitedQueue<String[]> field, int figureHeight, AtomicInteger added) {
         int plusPole;
         int fix = newStartY(field);
 
@@ -129,7 +125,7 @@ public class Day17 implements Puzzle {
             String[] line = new String[7];
             Arrays.fill(line, "0");
             field.addLine(line);
-            removed.getAndIncrement();
+            added.getAndIncrement();
         }
     }
 
