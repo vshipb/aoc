@@ -37,7 +37,7 @@ public class Day17 implements Puzzle {
 
         high = added.intValue() - (newStartY(field) + 4);
         y = (y * 53) + 64;
-        y = y + high ;
+        y = y + high;
         return String.valueOf(y);
     }
 
