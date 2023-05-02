@@ -1,6 +1,7 @@
 package io.qmbot.aoc.y2022;
 
 import io.qmbot.aoc.Puzzle;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -10,8 +11,7 @@ import java.util.stream.Collectors;
 public class Day23 implements Puzzle {
     @Override
     public String part1(String input) {
-        String[] splitInput = input.split("\n");
-        List<Elv> elves = new ArrayList<>();
+        List<Elv> elves = listOfElves(input.split("\n"));
 
         boolean north;
         boolean south;
@@ -21,13 +21,6 @@ public class Day23 implements Puzzle {
         int y;
         int x;
 
-        for (int i = 0; i < splitInput.length; i++) {
-            for (int j = 0; j < splitInput[0].length(); j++) {
-                if (splitInput[i].charAt(j) == '#') {
-                    elves.add(new Elv(i, j));
-                }
-            }
-        }
 
         int direction;
         int mainDirection = 0;
@@ -87,11 +80,8 @@ public class Day23 implements Puzzle {
             for (Elv elv : elves) {
                 if (!duplicates.contains(elv.second)) {
                     elv.first = elv.second;
+                    elv.second = null;
                 }
-            }
-
-            for (Elv elv : elves) {
-                elv.second = null;
             }
 
             mainDirection = direction(mainDirection);
@@ -107,8 +97,7 @@ public class Day23 implements Puzzle {
 
     @Override
     public String part2(String input) {
-        String[] splitInput = input.split("\n");
-        List<Elv> elves = new ArrayList<>();
+        List<Elv> elves = listOfElves(input.split("\n"));
 
         boolean north;
         boolean south;
@@ -117,20 +106,14 @@ public class Day23 implements Puzzle {
 
         int y;
         int x;
-
-        for (int i = 0; i < splitInput.length; i++) {
-            for (int j = 0; j < splitInput[0].length(); j++) {
-                if (splitInput[i].charAt(j) == '#') {
-                    elves.add(new Elv(i, j));
-                }
-            }
-        }
+        int i = 0;
 
         int direction;
         int mainDirection = 0;
         int countNoMove = 0;
 
-        for (int i = 0; i < 1000; i++) {
+        while (true) {
+            i++;
             for (Elv elf : elves) {
                 north = elf.northIsEmpty(elves);
                 south = elf.southIsEmpty(elves);
@@ -185,11 +168,8 @@ public class Day23 implements Puzzle {
             for (Elv elv : elves) {
                 if (!duplicates.contains(elv.second)) {
                     elv.first = elv.second;
+                    elv.second = null;
                 }
-            }
-
-            for (Elv elv : elves) {
-                elv.second = null;
             }
 
             mainDirection = direction(mainDirection);
@@ -197,8 +177,20 @@ public class Day23 implements Puzzle {
             if (countNoMove == elves.size()) return String.valueOf(i + 1);
             countNoMove = 0;
         }
+    }
 
-        return "";
+    private static List<Elv> listOfElves(String[] splitInput) {
+        List<Elv> elves = new ArrayList<>();
+
+        for (int i = 0; i < splitInput.length; i++) {
+            for (int j = 0; j < splitInput[0].length(); j++) {
+                if (splitInput[i].charAt(j) == '#') {
+                    elves.add(new Elv(i, j));
+                }
+            }
+        }
+
+        return elves;
     }
 
     private static int direction(int direction) {
