@@ -8,7 +8,7 @@ public class Day21 implements Puzzle {
     @Override
     public String part1(String input) {
         Map<String, Monkey> monkeys = monkeys(input);
-        return String.valueOf(Double.valueOf(monkeys.get("root").yell(monkeys)).longValue());
+        return String.valueOf((long) monkeys.get("root").yell(monkeys));
     }
 
     @Override
@@ -41,11 +41,7 @@ public class Day21 implements Puzzle {
             }
         }
 
-        while (root(monkeys, humn) == 0) {
-            humn--;
-        }
-
-        return String.valueOf(humn + 1);
+        return String.valueOf(humn);
     }
 
     private static Map<String, Monkey> monkeys(String input) {
