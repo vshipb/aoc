@@ -17,10 +17,6 @@ public class Day23 implements Puzzle {
         boolean west;
         boolean east;
 
-        int y;
-        int x;
-
-
         int direction;
         int mainDirection = 0;
 
@@ -31,9 +27,6 @@ public class Day23 implements Puzzle {
                 west = elf.westIsEmpty(elves);
                 east = elf.eastIsEmpty(elves);
 
-                y = elf.first.y;
-                x = elf.first.x;
-
                 direction = mainDirection;
 
                 for (int j = 0; j < 4; j++) {
@@ -41,54 +34,23 @@ public class Day23 implements Puzzle {
                         elf.second = elf.first;
                         break;
                     }
-                    switch (direction) {
-                        case 0 -> {
-                            if (north) {
-                                elf.second = new Point(y - 1, x);
-                            }
-                        }
-                        case 1 -> {
-                            if (south) {
-                                elf.second = new Point(y + 1, x);
-                            }
-                        }
-                        case 2 -> {
-                            if (west) {
-                                elf.second = new Point(y, x - 1);
-                            }
-                        }
-                        case 3 -> {
-                            if (east) {
-                                elf.second = new Point(y, x + 1);
-                            }
-                        }
-                        default -> throw new
-                                IllegalArgumentException("index of direction " + direction + " is not valid");
 
-                    }
+                    elfMoves(direction, north, south, west, east, elf);
+
                     if (elf.second != null) break;
 
                     direction = direction(direction);
                 }
             }
 
-            List<Point> duplicates = elves.stream().map(elv -> elv.second)
-                    .collect(Collectors.groupingBy(Function.identity(), Collectors.counting())).entrySet().stream()
-                    .filter(p -> p.getValue() > 1).map(Map.Entry::getKey).toList();
-
-            for (Elv elv : elves) {
-                if (!duplicates.contains(elv.second)) {
-                    elv.first = elv.second;
-                    elv.second = null;
-                }
-            }
+            duplicates(elves);
 
             mainDirection = direction(mainDirection);
         }
 
-        x = elves.stream().mapToInt(elv -> elv.first.x).max().orElseThrow()
+        int x = elves.stream().mapToInt(elv -> elv.first.x).max().orElseThrow()
                 - elves.stream().mapToInt(elv -> elv.first.x).min().orElseThrow() + 1;
-        y = elves.stream().mapToInt(elv -> elv.first.y).max().orElseThrow()
+        int y = elves.stream().mapToInt(elv -> elv.first.y).max().orElseThrow()
                 - elves.stream().mapToInt(elv -> elv.first.y).min().orElseThrow() + 1;
 
         return String.valueOf((x * y) - elves.size());
@@ -103,13 +65,10 @@ public class Day23 implements Puzzle {
         boolean west;
         boolean east;
 
-        int y;
-        int x;
-        int i = 0;
-
         int direction;
         int mainDirection = 0;
         int countNoMove = 0;
+        int i = 0;
 
         while (true) {
             i++;
@@ -119,9 +78,6 @@ public class Day23 implements Puzzle {
                 west = elf.westIsEmpty(elves);
                 east = elf.eastIsEmpty(elves);
 
-                y = elf.first.y;
-                x = elf.first.x;
-
                 direction = mainDirection;
 
                 for (int j = 0; j < 4; j++) {
@@ -130,51 +86,67 @@ public class Day23 implements Puzzle {
                         countNoMove++;
                         break;
                     }
-                    switch (direction) {
-                        case 0 -> {
-                            if (north) {
-                                elf.second = new Point(y - 1, x);
-                            }
-                        }
-                        case 1 -> {
-                            if (south) {
-                                elf.second = new Point(y + 1, x);
-                            }
-                        }
-                        case 2 -> {
-                            if (west) {
-                                elf.second = new Point(y, x - 1);
-                            }
-                        }
-                        case 3 -> {
-                            if (east) {
-                                elf.second = new Point(y, x + 1);
-                            }
-                        }
-                        default -> throw new
-                                IllegalArgumentException("index of direction " + direction + " is not valid");
-                    }
+
+                    elfMoves(direction, north, south, west, east, elf);
+
                     if (elf.second != null) break;
 
                     direction = direction(direction);
                 }
             }
 
-            List<Point> duplicates = elves.stream().map(elv -> elv.second)
-                    .collect(Collectors.groupingBy(Function.identity(), Collectors.counting())).entrySet().stream()
-                    .filter(p -> p.getValue() > 1).map(Map.Entry::getKey).toList();
-
-            for (Elv elv : elves) {
-                if (!duplicates.contains(elv.second)) {
-                    elv.first = elv.second;
-                    elv.second = null;
-                }
-            }
+            duplicates(elves);
 
             mainDirection = direction(mainDirection);
 
-            if (countNoMove == elves.size()) return String.valueOf(i + 1);
+            if (i % 10 == 0) System.out.println(i);
+
+            if (countNoMove == elves.size()) return String.valueOf(i);
             countNoMove = 0;
+        }
+    }
+
+    private static void duplicates(List<Elv> elves) {
+        List<Point> duplicates = elves.stream().map(elv -> elv.second)
+                .collect(Collectors.groupingBy(Function.identity(), Collectors.counting())).entrySet().stream()
+                .filter(p -> p.getValue() > 1).map(Map.Entry::getKey).toList();
+
+        for (Elv elv : elves) {
+            if (!duplicates.contains(elv.second)) {
+                elv.first = elv.second;
+            }
+            elv.second = null;
+        }
+    }
+
+    private static void elfMoves(int direction, boolean north, boolean south, boolean west, boolean east, Elv elf) {
+        int y = elf.first.y;
+        int x = elf.first.x;
+
+        switch (direction) {
+            case 0 -> {
+                if (north) {
+                    elf.second = new Point(y - 1, x);
+                }
+            }
+            case 1 -> {
+                if (south) {
+                    elf.second = new Point(y + 1, x);
+                }
+            }
+            case 2 -> {
+                if (west) {
+                    elf.second = new Point(y, x - 1);
+                }
+            }
+            case 3 -> {
+                if (east) {
+                    elf.second = new Point(y, x + 1);
+                }
+            }
+            default -> throw new
+                    IllegalArgumentException("index of direction " + direction + " is not valid");
+
         }
     }
 
@@ -209,55 +181,40 @@ public class Day23 implements Puzzle {
         }
 
         boolean northIsEmpty(List<Elv> elves) {
-            List<Point> points = new ArrayList<>();
             int north = first.y - 1;
             int x = first.x;
 
-            points.add(new Point(north, x - 1));
-            points.add(new Point(north, x));
-            points.add(new Point(north, x + 1));
+            List<Point> points = List.of(new Point(north, x - 1), new Point(north, x), new Point(north, x + 1));
 
-            return elves.stream()
-                    .map(e -> e.first).filter(points::contains).toList().size() == 0;
+            return elves.stream().map(e -> e.first).noneMatch(points::contains);
         }
 
         boolean southIsEmpty(List<Elv> elves) {
-            List<Point> points = new ArrayList<>();
             int south = first.y + 1;
             int x = first.x;
 
-            points.add(new Point(south, x - 1));
-            points.add(new Point(south, x));
-            points.add(new Point(south, x + 1));
 
-            return elves.stream()
-                    .map(e -> e.first).filter(points::contains).toList().size() == 0;
+            List<Point> points = List.of(new Point(south, x - 1), new Point(south, x), new Point(south, x + 1));
+
+            return elves.stream().map(e -> e.first).noneMatch(points::contains);
         }
 
         boolean westIsEmpty(List<Elv> elves) {
-            List<Point> points = new ArrayList<>();
             int west = first.x - 1;
             int y = first.y;
 
-            points.add(new Point(y - 1, west));
-            points.add(new Point(y, west));
-            points.add(new Point(y + 1, west));
+            List<Point> points = List.of(new Point(y - 1, west), new Point(y, west), new Point(y + 1, west));
 
-            return elves.stream()
-                    .map(e -> e.first).filter(points::contains).toList().size() == 0;
+            return elves.stream().map(e -> e.first).noneMatch(points::contains);
         }
 
         boolean eastIsEmpty(List<Elv> elves) {
-            List<Point> points = new ArrayList<>();
             int east = first.x + 1;
             int y = first.y;
 
-            points.add(new Point(y - 1, east));
-            points.add(new Point(y, east));
-            points.add(new Point(y + 1, east));
+            List<Point> points = List.of(new Point(y - 1, east), new Point(y, east), new Point(y + 1, east));
 
-            return elves.stream()
-                    .map(e -> e.first).filter(points::contains).toList().size() == 0;
+            return elves.stream().map(e -> e.first).noneMatch(points::contains);
         }
     }
 
