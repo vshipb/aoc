@@ -8,7 +8,7 @@ public class Day21 implements Puzzle {
     @Override
     public String part1(String input) {
         Map<String, Monkey> monkeys = monkeys(input);
-        return String.valueOf(monkeys.get("root").yell(monkeys));
+        return String.valueOf((long) monkeys.get("root").yell(monkeys));
     }
 
     @Override
@@ -16,15 +16,15 @@ public class Day21 implements Puzzle {
         long low = -(long) Integer.MAX_VALUE * 1024 * 1024;
         long high = (long) Integer.MAX_VALUE * 1024 * 1024;
         long humn;
-        long root;
+        double root;
 
         Map<String, Monkey> monkeys = monkeys(input);
         ((MonkeyWithOperation) monkeys.get("root")).operation = "-";
 
-        long lowValue = root(monkeys, low);
-        long highValue = root(monkeys, high);
+        double lowValue = root(monkeys, low);
+        double highValue = root(monkeys, high);
 
-        if (Long.signum(lowValue) == Long.signum(highValue)) {
+        if (Math.signum(lowValue) == Math.signum(highValue)) {
             throw new IllegalStateException();
         }
 
@@ -32,20 +32,16 @@ public class Day21 implements Puzzle {
             humn = low + (high - low) / 2;
             root = root(monkeys, humn);
 
-            if (Long.signum(root) == Long.signum(lowValue)) {
+            if (Math.signum(root) == Math.signum(lowValue)) {
                 low = humn;
-            } else if (Long.signum(root) == Long.signum(highValue)) {
+            } else if (Math.signum(root) == Math.signum(highValue)) {
                 high = humn;
             } else {
                 break;
             }
         }
 
-        while (root(monkeys, humn) == 0) {
-            humn--;
-        }
-
-        return String.valueOf(humn + 1);
+        return String.valueOf(humn);
     }
 
     private static Map<String, Monkey> monkeys(String input) {
@@ -63,14 +59,14 @@ public class Day21 implements Puzzle {
         return monkeys;
     }
 
-    private static long root(Map<String, Monkey> monkeys, long humn) {
+    private static double root(Map<String, Monkey> monkeys, long humn) {
         ((MonkeyWithNumber) monkeys.get("humn")).number = humn;
 
         return monkeys.get("root").yell(monkeys);
     }
 
     interface Monkey {
-        long yell(Map<String, Monkey> monkeys);
+        double yell(Map<String, Monkey> monkeys);
     }
 
     private static class MonkeyWithNumber implements Monkey {
@@ -81,7 +77,7 @@ public class Day21 implements Puzzle {
         }
 
         @Override
-        public long yell(Map<String, Monkey> monkeys) {
+        public double yell(Map<String, Monkey> monkeys) {
             return number;
         }
     }
@@ -98,7 +94,7 @@ public class Day21 implements Puzzle {
         }
 
         @Override
-        public long yell(Map<String, Monkey> monkeys) {
+        public double yell(Map<String, Monkey> monkeys) {
             switch (operation) {
                 case "-" -> {
                     return monkeys.get(first).yell(monkeys) - monkeys.get(second).yell(monkeys);
