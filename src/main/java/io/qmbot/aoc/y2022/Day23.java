@@ -10,40 +10,14 @@ import java.util.stream.Collectors;
 public class Day23 implements Puzzle {
     @Override
     public String part1(String input) {
-        List<Elv> elves = listOfElves(input.split("\n"));
-
-        boolean north;
-        boolean south;
-        boolean west;
-        boolean east;
-
-        int direction;
+        String[] splitInput = input.split("\n");
+        List<Elv> elves = listOfElves(splitInput);
         int mainDirection = 0;
 
         for (int i = 0; i < 10; i++) {
-            for (Elv elf : elves) {
-                north = elf.northIsEmpty(elves);
-                south = elf.southIsEmpty(elves);
-                west = elf.westIsEmpty(elves);
-                east = elf.eastIsEmpty(elves);
+            firstHalf(elves, mainDirection);
 
-                direction = mainDirection;
-
-                for (int j = 0; j < 4; j++) {
-                    if ((north && south && west && east) || (!north && !south && !west && !east)) {
-                        elf.second = elf.first;
-                        break;
-                    }
-
-                    elfMoves(direction, north, south, west, east, elf);
-
-                    if (elf.second != null) break;
-
-                    direction = direction(direction);
-                }
-            }
-
-            duplicates(elves);
+            secondHalf(elves);
 
             mainDirection = direction(mainDirection);
         }
@@ -58,55 +32,58 @@ public class Day23 implements Puzzle {
 
     @Override
     public String part2(String input) {
-        List<Elv> elves = listOfElves(input.split("\n"));
+        String[] splitInput = input.split("\n");
+        List<Elv> elves = listOfElves(splitInput);
 
-        boolean north;
-        boolean south;
-        boolean west;
-        boolean east;
-
-        int direction;
         int mainDirection = 0;
-        int countNoMove = 0;
         int i = 0;
 
         while (true) {
             i++;
-            for (Elv elf : elves) {
-                north = elf.northIsEmpty(elves);
-                south = elf.southIsEmpty(elves);
-                west = elf.westIsEmpty(elves);
-                east = elf.eastIsEmpty(elves);
 
-                direction = mainDirection;
+            if (firstHalf(elves, mainDirection)) return String.valueOf(i);
 
-                for (int j = 0; j < 4; j++) {
-                    if ((north && south && west && east) || (!north && !south && !west && !east)) {
-                        elf.second = elf.first;
-                        countNoMove++;
-                        break;
-                    }
-
-                    elfMoves(direction, north, south, west, east, elf);
-
-                    if (elf.second != null) break;
-
-                    direction = direction(direction);
-                }
-            }
-
-            duplicates(elves);
+            secondHalf(elves);
 
             mainDirection = direction(mainDirection);
 
             if (i % 10 == 0) System.out.println(i);
-
-            if (countNoMove == elves.size()) return String.valueOf(i);
-            countNoMove = 0;
         }
     }
+    private static  boolean firstHalf(List<Elv> elves, int mainDirection) {
+        boolean north;
+        boolean south;
+        boolean west;
+        boolean east;
+        int direction;
+        int countNoMove = 0;
 
-    private static void duplicates(List<Elv> elves) {
+        for (Elv elf : elves) {
+            north = elf.northIsEmpty(elves);
+            south = elf.southIsEmpty(elves);
+            west = elf.westIsEmpty(elves);
+            east = elf.eastIsEmpty(elves);
+
+            direction = mainDirection;
+
+            for (int j = 0; j < 4; j++) {
+                if ((north && south && west && east) || (!north && !south && !west && !east)) {
+                    elf.second = elf.first;
+                    countNoMove++;
+                    break;
+                }
+
+                elfMoves(direction, north, south, west, east, elf);
+
+                if (elf.second != null) break;
+
+                direction = direction(direction);
+            }
+        }
+        return (countNoMove == elves.size());
+    }
+
+    private static void secondHalf(List<Elv> elves) {
         List<Point> duplicates = elves.stream().map(elv -> elv.second)
                 .collect(Collectors.groupingBy(Function.identity(), Collectors.counting())).entrySet().stream()
                 .filter(p -> p.getValue() > 1).map(Map.Entry::getKey).toList();
