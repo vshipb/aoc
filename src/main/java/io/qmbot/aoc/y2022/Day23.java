@@ -50,6 +50,7 @@ public class Day23 implements Puzzle {
             if (i % 10 == 0) System.out.println(i);
         }
     }
+
     private static  boolean firstHalf(List<Elv> elves, int mainDirection) {
         boolean north;
         boolean south;
