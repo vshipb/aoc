@@ -10,97 +10,76 @@ import java.util.stream.Collectors;
 public class Day23 implements Puzzle {
     @Override
     public String part1(String input) {
-        String[] splitInput = input.split("\n");
-        List<Elv> elves = listOfElves(splitInput);
+        List<Elf> elves = listOfElves(input);
         int mainDirection = 0;
-
         for (int i = 0; i < 10; i++) {
             firstHalf(elves, mainDirection);
-
             secondHalf(elves);
-
-            mainDirection = direction(mainDirection);
+            mainDirection = nextDirection(mainDirection);
         }
-
-        int x = elves.stream().mapToInt(elv -> elv.first.x).max().orElseThrow()
-                - elves.stream().mapToInt(elv -> elv.first.x).min().orElseThrow() + 1;
-        int y = elves.stream().mapToInt(elv -> elv.first.y).max().orElseThrow()
-                - elves.stream().mapToInt(elv -> elv.first.y).min().orElseThrow() + 1;
-
+        int x = elves.stream().mapToInt(elf -> elf.first.x).max().orElseThrow()
+                - elves.stream().mapToInt(elf -> elf.first.x).min().orElseThrow() + 1;
+        int y = elves.stream().mapToInt(elf -> elf.first.y).max().orElseThrow()
+                - elves.stream().mapToInt(elf -> elf.first.y).min().orElseThrow() + 1;
         return String.valueOf((x * y) - elves.size());
     }
 
     @Override
     public String part2(String input) {
-        String[] splitInput = input.split("\n");
-        List<Elv> elves = listOfElves(splitInput);
-
+        List<Elf> elves = listOfElves(input);
         int mainDirection = 0;
         int i = 0;
-
         while (true) {
             i++;
-
             if (firstHalf(elves, mainDirection)) return String.valueOf(i);
-
             secondHalf(elves);
-
-            mainDirection = direction(mainDirection);
-
+            mainDirection = nextDirection(mainDirection);
             if (i % 10 == 0) System.out.println(i);
         }
     }
 
-    private static  boolean firstHalf(List<Elv> elves, int mainDirection) {
+    private static boolean firstHalf(List<Elf> elves, int mainDirection) {
         boolean north;
         boolean south;
         boolean west;
         boolean east;
         int direction;
         int countNoMove = 0;
-
-        for (Elv elf : elves) {
+        for (Elf elf : elves) {
             north = elf.northIsEmpty(elves);
             south = elf.southIsEmpty(elves);
             west = elf.westIsEmpty(elves);
             east = elf.eastIsEmpty(elves);
-
             direction = mainDirection;
-
             for (int j = 0; j < 4; j++) {
                 if ((north && south && west && east) || (!north && !south && !west && !east)) {
                     elf.second = elf.first;
                     countNoMove++;
                     break;
                 }
-
                 elfMoves(direction, north, south, west, east, elf);
-
                 if (elf.second != null) break;
-
-                direction = direction(direction);
+                direction = nextDirection(direction);
             }
         }
         return (countNoMove == elves.size());
     }
 
-    private static void secondHalf(List<Elv> elves) {
-        List<Point> duplicates = elves.stream().map(elv -> elv.second)
+    private static void secondHalf(List<Elf> elves) {
+        List<Point> duplicates = elves.stream().map(elf -> elf.second)
                 .collect(Collectors.groupingBy(Function.identity(), Collectors.counting())).entrySet().stream()
                 .filter(p -> p.getValue() > 1).map(Map.Entry::getKey).toList();
-
-        for (Elv elv : elves) {
-            if (!duplicates.contains(elv.second)) {
-                elv.first = elv.second;
+        for (Elf elf : elves) {
+            if (!duplicates.contains(elf.second)) {
+                elf.first = elf.second;
             }
-            elv.second = null;
+            elf.second = null;
         }
     }
 
-    private static void elfMoves(int direction, boolean north, boolean south, boolean west, boolean east, Elv elf) {
+    private static void elfMoves(int direction, boolean north, boolean south, boolean west, boolean east, Elf elf) {
         int y = elf.first.y;
         int x = elf.first.x;
-
         switch (direction) {
             case 0 -> {
                 if (north) {
@@ -128,70 +107,54 @@ public class Day23 implements Puzzle {
         }
     }
 
-    private static List<Elv> listOfElves(String[] splitInput) {
-        List<Elv> elves = new ArrayList<>();
-
+    private static List<Elf> listOfElves(String input) {
+        String[] splitInput = input.split("\n");
+        List<Elf> elves = new ArrayList<>();
         for (int i = 0; i < splitInput.length; i++) {
             for (int j = 0; j < splitInput[0].length(); j++) {
                 if (splitInput[i].charAt(j) == '#') {
-                    elves.add(new Elv(i, j));
+                    elves.add(new Elf(i, j));
                 }
             }
         }
-
         return elves;
     }
 
-    private static int direction(int direction) {
-        if (direction == 3) {
-            return 0;
-        } else {
-            return direction + 1;
-        }
+    private static int nextDirection(int direction) {
+        return  (direction + 1) % 4;
     }
 
-    private static class Elv {
+    private static class Elf {
         Point first;
         Point second;
-
-        public Elv(int y, int x) {
+        public Elf(int y, int x) {
             this.first = new Point(y, x);
         }
-
-        boolean northIsEmpty(List<Elv> elves) {
+        boolean northIsEmpty(List<Elf> elves) {
             int north = first.y - 1;
             int x = first.x;
-
             List<Point> points = List.of(new Point(north, x - 1), new Point(north, x), new Point(north, x + 1));
-
             return elves.stream().map(e -> e.first).noneMatch(points::contains);
         }
 
-        boolean southIsEmpty(List<Elv> elves) {
+        boolean southIsEmpty(List<Elf> elves) {
             int south = first.y + 1;
             int x = first.x;
-
-
             List<Point> points = List.of(new Point(south, x - 1), new Point(south, x), new Point(south, x + 1));
-
             return elves.stream().map(e -> e.first).noneMatch(points::contains);
         }
 
-        boolean westIsEmpty(List<Elv> elves) {
+        boolean westIsEmpty(List<Elf> elves) {
             int west = first.x - 1;
             int y = first.y;
-
             List<Point> points = List.of(new Point(y - 1, west), new Point(y, west), new Point(y + 1, west));
-
             return elves.stream().map(e -> e.first).noneMatch(points::contains);
         }
 
-        boolean eastIsEmpty(List<Elv> elves) {
+        boolean eastIsEmpty(List<Elf> elves) {
             int east = first.x + 1;
             int y = first.y;
-
             List<Point> points = List.of(new Point(y - 1, east), new Point(y, east), new Point(y + 1, east));
-
             return elves.stream().map(e -> e.first).noneMatch(points::contains);
         }
     }
