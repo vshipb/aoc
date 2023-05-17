@@ -2,6 +2,7 @@ package io.qmbot.aoc.y2022;
 
 import io.qmbot.aoc.Puzzle;
 import java.util.ArrayList;
+import java.util.EnumMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -12,7 +13,7 @@ import java.util.stream.Stream;
 public class Day23 implements Puzzle {
     @Override
     public String part1(String input) {
-        List<Elf> elves = listOfElves(input);
+        List<Elf> elves = parseInput(input);
         Direction mainDirection = Direction.North;
         for (int i = 0; i < 10; i++) {
             firstHalf(elves, mainDirection);
@@ -28,7 +29,7 @@ public class Day23 implements Puzzle {
 
     @Override
     public String part2(String input) {
-        List<Elf> elves = listOfElves(input);
+        List<Elf> elves = parseInput(input);
         Direction mainDirection = Direction.North;
         int i = 0;
         while (true) {
@@ -40,31 +41,27 @@ public class Day23 implements Puzzle {
     }
 
     private static boolean firstHalf(List<Elf> elves, Direction mainDirection) {
-        boolean north;
-        boolean south;
-        boolean west;
-        boolean east;
         Direction direction;
-        int countNoMove = 0;
+        boolean moved = false;
         Set<Point> points = elves.stream().map(e -> e.current).collect(Collectors.toSet());
         for (Elf elf : elves) {
-            north = elf.directionIsEmpty(Direction.North, points);
-            south = elf.directionIsEmpty(Direction.South, points);
-            west = elf.directionIsEmpty(Direction.West, points);
-            east = elf.directionIsEmpty(Direction.East, points);
+            EnumMap<Direction, Boolean> isDirectionEmptyMap = new EnumMap<>(Direction.class);
+            for (Direction d : Direction.values()) {
+                isDirectionEmptyMap.put(d, elf.isDirectionEmpty(d, points));
+            }
             direction = mainDirection;
-            for (int j = 0; j < 4; j++) {
-                if ((north && south && west && east) || (!north && !south && !west && !east)) {
-                    elf.next = elf.current;
-                    countNoMove++;
-                    break;
-                }
-                elfMoves(direction, north, south, west, east, elf);
-                if (elf.next != null) break;
+            if ((isDirectionEmptyMap.values().stream().allMatch(b -> b))
+                    || (isDirectionEmptyMap.values().stream().noneMatch(b -> b))) {
+                elf.next = elf.current;
+                continue;
+            }
+            moved = true;
+            while (!isDirectionEmptyMap.get(direction)) {
                 direction = direction.nextDirection();
             }
+            elf.next = direction.getPoint(elf.current);
         }
-        return (countNoMove == elves.size());
+        return !moved;
     }
 
     private static void secondHalf(List<Elf> elves) {
@@ -79,36 +76,7 @@ public class Day23 implements Puzzle {
         }
     }
 
-    private static void elfMoves(Direction dir, boolean north, boolean south, boolean west, boolean east, Elf elf) {
-        Point point = elf.current;
-        switch (dir) {
-            case  North -> {
-                if (north) {
-                    elf.next = dir.getPoint(point);
-                }
-            }
-            case South -> {
-                if (south) {
-                    elf.next = dir.getPoint(point);
-                }
-            }
-            case West -> {
-                if (west) {
-                    elf.next = dir.getPoint(point);
-                }
-            }
-            case East -> {
-                if (east) {
-                    elf.next = dir.getPoint(point);
-                }
-            }
-            default -> throw new
-                    IllegalArgumentException("index of direction " + dir + " is not valid");
-
-        }
-    }
-
-    private static List<Elf> listOfElves(String input) {
+    private static List<Elf> parseInput(String input) {
         String[] splitInput = input.split("\n");
         List<Elf> elves = new ArrayList<>();
         for (int i = 0; i < splitInput.length; i++) {
@@ -169,6 +137,7 @@ public class Day23 implements Puzzle {
                 return Stream.of(new Point(p.y - 1, p.x + 1), new Point(p.y, p.x + 1), new Point(p.y + 1, p.x + 1));
             }
         };
+
         public Direction nextDirection() {
             return Direction.values()[(ordinal() + 1) % 4];
         }
@@ -182,7 +151,7 @@ public class Day23 implements Puzzle {
             this.current = new Point(y, x);
         }
 
-        boolean directionIsEmpty(Direction direction, Set<Point> points) {
+        boolean isDirectionEmpty(Direction direction, Set<Point> points) {
             return direction.getPoints(current).noneMatch(points::contains);
         }
     }
