@@ -89,54 +89,24 @@ public class Day23 implements Puzzle {
         return elves;
     }
 
-    interface Dir {
-        Point getPoint(Point p);
+    enum Direction {
+        North(-1, 0), South(1, 0), West(0, -1), East(0, 1);
+        final int dy;
+        final int dx;
 
-        Stream<Point> getPoints(Point p);
-    }
+        Direction(int dy, int dx) {
+            this.dy = dy;
+            this.dx = dx;
+        }
 
-    enum Direction implements Dir {
-        North {
-            @Override
-            public Point getPoint(Point p) {
-                return new Point(p.y - 1, p.x);
-            }
+        public Point getPoint(Point p) {
+            return new Point(p.y + dy, p.x + dx);
+        }
 
-            @Override
-            public Stream<Point> getPoints(Point p) {
-                return Stream.of(new Point(p.y - 1, p.x - 1), new Point(p.y - 1, p.x), new Point(p.y - 1, p.x + 1));
-            }
-        }, South {
-            @Override
-            public Point getPoint(Point p) {
-                return new Point(p.y + 1, p.x);
-            }
-
-            @Override
-            public Stream<Point> getPoints(Point p) {
-                return Stream.of(new Point(p.y + 1, p.x - 1), new Point(p.y + 1, p.x), new Point(p.y + 1, p.x + 1));
-            }
-        }, West {
-            @Override
-            public Point getPoint(Point p) {
-                return new Point(p.y, p.x - 1);
-            }
-
-            @Override
-            public Stream<Point> getPoints(Point p) {
-                return Stream.of(new Point(p.y - 1, p.x - 1), new Point(p.y, p.x - 1), new Point(p.y + 1, p.x - 1));
-            }
-        }, East {
-            @Override
-            public Point getPoint(Point p) {
-                return new Point(p.y, p.x + 1);
-            }
-
-            @Override
-            public Stream<Point> getPoints(Point p) {
-                return Stream.of(new Point(p.y - 1, p.x + 1), new Point(p.y, p.x + 1), new Point(p.y + 1, p.x + 1));
-            }
-        };
+        public Stream<Point> getPoints(Point p) {
+            return dy == 0 ? Stream.of(new Point(p.y - 1, p.x + dx), new Point(p.y, p.x + dx), new Point(p.y + 1, p.x + dx))
+                    : Stream.of(new Point(p.y + dy, p.x - 1), new Point(p.y + dy, p.x), new Point(p.y + dy, p.x + 1));
+        }
 
         public Direction nextDirection() {
             return Direction.values()[(ordinal() + 1) % 4];
