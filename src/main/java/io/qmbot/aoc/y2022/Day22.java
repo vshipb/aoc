@@ -66,16 +66,9 @@ public class Day22 implements Puzzle {
         Square[][] board = new Square[boardSizeY][boardSizeX];
 
         for (Square square : squares) {
-            board[square.boardY][square.boardX] = square;
+            board[square.squareY][square.squareX] = square;
         }
-
         Me me = new Me(0, 0);
-
-        // 0 = R
-        // 1 = D
-        // 2 = L
-        // 3 = U
-
         for (int x = 0; x < boardSizeX; x++) {
             if (board[0][x] != null) {
                 for (int squareX = 0; squareX <= size; squareX++) {
@@ -114,165 +107,78 @@ public class Day22 implements Puzzle {
         }
         int row = (me.boardSquare.pointY * (size + 1)) + me.point.pointY + 1;
         int column = (me.boardSquare.pointX * (size + 1)) + me.point.pointX + 1;
-        int facing = me.direction;
+        int facing = me.direction.ordinal();
 
         int result = row * 1000 + column * 4 + facing;
         return String.valueOf(result);
     }
 
-
     @Override
     public String part2(String input) {
-        return "";
+        return null;
+    }
+
+
+    enum Direction {
+        East(0, 1), South(1, 0), West(0, -1), North(-1, 0);
+        final int dy;
+        final int dx;
+
+        Direction(int dy, int dx) {
+            this.dy = dy;
+            this.dx = dx;
+        }
+
+        public Point getPoint(Point p) {
+            return new Point(p.pointY + dy, p.pointX + dx);
+        }
+
+        public Point getPoint(Point p, int sizeY, int sizeX) {
+            return new Point((p.pointY + dy + sizeY) % sizeY, (p.pointX + dx + sizeX) % sizeX);
+        }
+
+        public Point getPoint(Point p, Square[][] board) {
+            while (true) {
+                p = getPoint(p, board.length, board[0].length);
+                if (board[p.pointY][p.pointX] != null) {
+                    return p;
+                }
+            }
+        }
+
     }
 
     private static class Me {
         private Point point;
-        private int direction;
+        private Direction direction;
         private Point boardSquare;
 
         public Me(int y, int x) {
             this.point = new Point(y, x);
-            this.direction = 0;
+            this.direction = Direction.East;
         }
 
         private void move2(int move, int size, Square[][] board) {
-            int boardSizeY = board.length - 1;
-            int boardSizeX = board[0].length - 1;
-            int boardBeforeX = boardSquare.pointX;
-            int boardBeforeY = boardSquare.pointY;
-            int newX;
-            int newY;
-            int x = point.pointX;
-            int y = point.pointY;
-
-            switch (direction) {
-                case 0 -> {
-                    for (int i = 0; i < move; i++) {
-
-                        newX = point.pointX + 1;
-
-                        if (newX == size) {
-                            newX = 0;
-
-                            if (boardSquare.pointX == boardSizeX || board[boardSquare.pointY][boardSquare.pointX + 1] == null) {
-                                for (int j = 0; j < boardSizeX; j++) {
-                                    if (board[boardSquare.pointY][j] != null) {
-                                        boardSquare.pointX = j;
-                                        break;
-                                    }
-                                }
-                            } else {
-                                boardSquare.pointX++;
-                            }
-                        }
-
-                        if (board[boardSquare.pointY][boardSquare.pointX].points[y][newX] == '.') {
-                            point.pointX = newX;
-                        } else if (board[boardSquare.pointY][boardSquare.pointX].points[y][newX] == '#') {
-                            boardSquare.pointX = boardBeforeX;
-                            point.pointX = size - 1;
-                        }
-                    }
+            for (int i = 0; i < move; i++) {
+                Point boardBefore = boardSquare;
+                Point next = direction.getPoint(point);
+                if (next.pointX == size || next.pointX == -1 || next.pointY == size || next.pointY == -1) {
+                    next = direction.getPoint(point, size, size);
+                    boardSquare = direction.getPoint(boardSquare, board);
                 }
-                case 1 -> {
-                    for (int i = 0; i < move; i++) {
 
-                        newY = point.pointY + 1;
-
-                        if (newY == size) {
-                            newY = 0;
-
-                            if (boardSquare.pointY == boardSizeY || board[boardSquare.pointY + 1][boardSquare.pointX] == null) {
-                                for (int j = 0; j < boardSizeY; j++) {
-                                    if (board[j][boardSquare.pointX] != null) {
-                                        boardSquare.pointY = j;
-                                        break;
-                                    }
-                                }
-                            } else {
-                                boardSquare.pointY++;
-                            }
-                        }
-
-                        if (board[boardSquare.pointY][boardSquare.pointX].points[newY][x] == '.') {
-                            point.pointY = newY;
-                        } else if (board[boardSquare.pointY][boardSquare.pointX].points[newY][x] == '#') {
-                            boardSquare.pointY = boardBeforeY;
-                            point.pointY = size - 1;
-                        }
+                switch (board[boardSquare.pointY][boardSquare.pointX].points[next.pointY][next.pointX]) {
+                    case '.' -> point = next;
+                    case '#' -> {
+                        boardSquare = boardBefore;
                     }
+                    default -> System.out.println("exception");
                 }
-                case 2 -> {
-                    for (int i = 0; i < move; i++) {
-
-                        newX = point.pointX - 1;
-
-                        if (newX == -1) {
-                            newX = size - 1;
-
-
-                            if (boardSquare.pointX == 0 || board[boardSquare.pointY][boardSquare.pointX - 1] == null) {
-                                for (int j = boardSizeX - 1; j > -1; j--) {
-                                    if (board[boardSquare.pointY][j] != null) {
-                                        boardSquare.pointX = j;
-                                        break;
-                                    }
-                                }
-                            } else {
-                                boardSquare.pointX--;
-                            }
-                        }
-
-                        if (board[boardSquare.pointY][boardSquare.pointX].points[y][newX] == '.') {
-                            point.pointX = newX;
-                        } else if (board[boardSquare.pointY][boardSquare.pointX].points[y][newX] == '#') {
-                            boardSquare.pointX = boardBeforeX;
-                            point.pointX = 0;
-                        }
-                    }
-                }
-                case 3 -> {
-                    for (int i = 0; i < move; i++) {
-                        newY = point.pointY - 1;
-
-                        if (newY == -1) {
-                            newY = size - 1;
-
-                            if (boardSquare.pointY == 0 || board[boardSquare.pointY - 1][boardSquare.pointX] == null) {
-                                for (int j = boardSizeY - 1; j > -1; j--) {
-                                    if (board[j][boardSquare.pointX] != null) {
-                                        boardSquare.pointY = j;
-                                        break;
-                                    }
-                                }
-                            } else {
-                                boardSquare.pointY--;
-                            }
-                        }
-
-                        if (board[boardSquare.pointY][boardSquare.pointX].points[newY][x] == '.') {
-                            point.pointY = newY;
-                        } else if (board[boardSquare.pointY][boardSquare.pointX].points[newY][x] == '#') {
-                            boardSquare.pointY = boardBeforeY;
-                            point.pointY = 0;
-                        }
-                    }
-                }
-                default -> System.out.println("exception");
             }
         }
 
         private void round(char command) {
-            switch (command) {
-                case 'R' -> {
-                    direction = (direction < 3) ? direction + 1 : 0;
-                }
-                case 'L' -> {
-                    direction = (direction > 0) ? direction - 1 : 3;
-                }
-                default -> System.out.println("exception");
-            }
+            direction = Direction.values()[(direction.ordinal() + (command == 'R' ? 1 : 3)) % 4];
         }
     }
 
@@ -280,16 +186,16 @@ public class Day22 implements Puzzle {
         char[][] points;
         Point first;
         Point second;
-        int boardY;
-        int boardX;
+        int squareY;
+        int squareX;
 
-        public Square(int size, Point first, Point second, int boardY, int boardX) {
+        public Square(int size, Point first, Point second, int squareY, int squareX) {
             this.points = new char[size][size];
             ;
             this.first = first;
             this.second = second;
-            this.boardY = boardY;
-            this.boardX = boardX;
+            this.squareY = squareY;
+            this.squareX = squareX;
         }
     }
 
