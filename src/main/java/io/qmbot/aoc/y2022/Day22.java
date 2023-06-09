@@ -6,8 +6,8 @@ import java.util.Arrays;
 public class Day22 implements Puzzle {
     @Override
     public String part1(String input) {
-        String[] splitInput = input.split("\r\n\r\n");
-        String[] lines = splitInput[0].split("\r\n");
+        String[] splitInput = input.split("\n\n");
+        String[] lines = splitInput[0].split("\n");
         String directions = splitInput[1];
 
         int maxY = lines.length;
@@ -115,8 +115,8 @@ public class Day22 implements Puzzle {
 
     @Override
     public String part2(String input) {
-        String[] splitInput = input.split("\r\n\r\n");
-        String[] lines = splitInput[0].split("\r\n");
+        String[] splitInput = input.split("\n\n");
+        String[] lines = splitInput[0].split("\n");
         String directions = splitInput[1];
 
         int maxY = lines.length;
@@ -183,32 +183,32 @@ public class Day22 implements Puzzle {
                 squares[0].top = squares[5];
                 squares[0].right = squares[1];
                 squares[0].bottom = squares[2];
-                squares[0].left = squares[4];
+                squares[0].left = squares[3];
 
                 squares[1].top = squares[5];
-                squares[1].right = squares[0];
-                squares[1].bottom = squares[3];
-                squares[1].left = squares[2];
+                squares[1].right = squares[4];
+                squares[1].bottom = squares[2];
+                squares[1].left = squares[0];
 
                 squares[2].top = squares[0];
                 squares[2].right = squares[1];
-                squares[2].bottom = squares[3];
-                squares[2].left = squares[4];
+                squares[2].bottom = squares[4];
+                squares[2].left = squares[3];
 
                 squares[3].top = squares[2];
-                squares[3].right = squares[1];
+                squares[3].right = squares[4];
                 squares[3].bottom = squares[5];
-                squares[3].left = squares[4];
+                squares[3].left = squares[0];
 
-                squares[4].top = squares[3];
-                squares[4].right = squares[5];
-                squares[4].bottom = squares[0];
-                squares[4].left = squares[2];
+                squares[4].top = squares[2];
+                squares[4].right = squares[1];
+                squares[4].bottom = squares[5];
+                squares[4].left = squares[3];
 
                 squares[5].top = squares[3];
-                squares[5].right = squares[1];
-                squares[5].bottom = squares[0];
-                squares[5].left = squares[4];
+                squares[5].right = squares[4];
+                squares[5].bottom = squares[1];
+                squares[5].left = squares[0];
             }
             case 4 -> {
                 squares[0].top = squares[1];
