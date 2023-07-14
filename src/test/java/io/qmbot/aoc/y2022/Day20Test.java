@@ -14,6 +14,18 @@ public class Day20Test {
             "-2\n" +
             "0\n" +
             "4";
+    String input2 = "1";
+    @Test
+    public void newIndex() {
+        Assertions.assertEquals(Day20.newIndex(1, 0, 2), 1);
+        Assertions.assertEquals(Day20.newIndex(0, 1, 2), 1);
+        Assertions.assertEquals(Day20.newIndex(0, 0, 2), 0);
+        Assertions.assertEquals(Day20.newIndex(0, 0, 1), 0);
+        Assertions.assertEquals(Day20.newIndex(-1, 0, 1), 0);
+        Assertions.assertEquals(Day20.newIndex(-50, 0, 1), 0);
+        Assertions.assertEquals(Day20.newIndex(50, 0, 1), 0);
+        Assertions.assertEquals(Day20.newIndex(1, 0, 1), 0);
+    }
 
     @Test
     public void part1() {
