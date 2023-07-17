@@ -18,19 +18,30 @@ public class Day19 implements Puzzle {
 
         int time = 0;
         List<Integer> bestGeode = new ArrayList<>();
+        List<Robot> newRobots = new ArrayList<>();
 
         for (Blueprint blueprint : blueprintList) {
             Me me = new Me(blueprint);
             List<Robot> robotTypes = Arrays.asList(blueprint.oreRobot, blueprint.clayRobot, blueprint.obsidianRobot, blueprint.geodeRobot);
             while (time < 24) {
-                Robot robotType = me.priority(blueprint.geodeRobot);
-                if (robotType != null) {
+                int k = 0;
+                //Robot robotType = me.priority(blueprint.geodeRobot);
+                while (me.priority(blueprint.geodeRobot) != null) {
+                    newRobots.add(me.priority(blueprint.geodeRobot));
+                }
+
+                //if (robotType != null) {
+                for (Robot robotType : newRobots) {
                     me.craft(robotType);
                 }
+                //}
                 me.robots.forEach((robot, count) -> me.materials.put(robot, me.materials.get(robot) + count));
-                if (robotType != null) {
+                //if (robotType != null) {
+                for (Robot robotType : newRobots) {
                     me.robots.put(robotType, me.robots.get(robotType) + 1);
                 }
+                //}
+                newRobots.clear();
                 time++;
             }
             bestGeode.add(me.materials.get(robotTypes.get(3)));
@@ -113,10 +124,6 @@ public class Day19 implements Puzzle {
     }
 
     static class Robot {
-        Map<Robot, Integer> cost;
-
-        public Robot() {
-            this.cost = new HashMap<>();
-        }
+        Map<Robot, Integer> cost = new HashMap<>();
     }
 }
