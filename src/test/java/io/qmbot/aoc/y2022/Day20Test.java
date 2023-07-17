@@ -17,7 +17,24 @@ public class Day20Test {
     String input2 = "1";
     @Test
     public void newIndex() {
-        Assertions.assertEquals(Day20.newIndex(1, 0, 2), 1);
+        // 1
+        //2
+        //-3
+        //3
+        //-2
+        //0
+        //4
+        Assertions.assertEquals(Day20.newIndex(4, 5, 7), 3);
+
+        Assertions.assertEquals(Day20.newIndex(1, 0, 7), 1);
+        Assertions.assertEquals(Day20.newIndex(2, 0, 7), 2);
+        Assertions.assertEquals(Day20.newIndex(-3, 1, 7), 4);
+        Assertions.assertEquals(Day20.newIndex(3, 2, 7), 5);
+        Assertions.assertEquals(Day20.newIndex(-2, 2, 7), 6);
+        Assertions.assertEquals(Day20.newIndex(0, 3, 7), 3);
+
+        Assertions.assertEquals(Day20.newIndex(-2, 1, 7), 5);
+        Assertions.assertEquals(Day20.newIndex(1, 3, 7), 4);
         Assertions.assertEquals(Day20.newIndex(0, 1, 2), 1);
         Assertions.assertEquals(Day20.newIndex(0, 0, 2), 0);
         Assertions.assertEquals(Day20.newIndex(0, 0, 1), 0);
@@ -34,6 +51,6 @@ public class Day20Test {
 
     @Test
     public void part2() {
-        Assertions.assertEquals("301", p.part2(input));
+        Assertions.assertEquals("1623178306", p.part2(input));
     }
 }
