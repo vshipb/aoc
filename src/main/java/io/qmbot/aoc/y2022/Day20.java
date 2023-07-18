@@ -9,7 +9,7 @@ import java.util.stream.Stream;
 public class Day20 implements Puzzle {
     @Override
     public String part1(String input) {
-        return  mixing(input, 1, 1);
+        return mixing(input, 1, 1);
     }
 
     @Override
@@ -18,23 +18,22 @@ public class Day20 implements Puzzle {
     }
 
     private static String mixing(String input, int key, int repeat) {
-        int[] inputSplit = Stream.of(input.split("\n")).mapToInt(Integer::parseInt).toArray();
-        List<AtomicLong> list = new ArrayList<>();
-        List<AtomicLong> list2 = new ArrayList<>();
-        int length = inputSplit.length;
-        fillSheets(inputSplit, list, list2, key);
+        List<AtomicLong> list = parseInput(input, key);
+        List<AtomicLong> initialList = list.stream().toList();
+        int length = list.size();
         for (int j = 0; j < repeat; j++) {
-            mix(length, list, list2);
+            mix(length, list, initialList);
         }
-        return String.valueOf(answer(list, length, nullIndex(length, list)));
-    }
-    static long answer(List<AtomicLong> list, int length, int ex) {
-        return list.get(index(length, 1000 + ex)).get()
-                + list.get(index(length, 2000 + ex)).get()
-                +list.get(index(length, 3000 + ex)).get();
+        return String.valueOf(answer(list, length, zeroIndex(length, list)));
     }
 
-    static int nullIndex(int length, List<AtomicLong> list) {
+    static long answer(List<AtomicLong> list, int length, int zeroIndex) {
+        return list.get(index(length, 1000 + zeroIndex)).get()
+                + list.get(index(length, 2000 + zeroIndex)).get()
+                + list.get(index(length, 3000 + zeroIndex)).get();
+    }
+
+    static int zeroIndex(int length, List<AtomicLong> list) {
         for (int i = 0; i < length; i++) {
             if (list.get(i).get() == 0) {
                 return i;
@@ -46,17 +45,14 @@ public class Day20 implements Puzzle {
     static int newIndex(long element, int oldIndex, int length) {
         length = length - 1;
         if (length == 0) return 0;
-        int newIndex;
-        newIndex = (int) ((oldIndex + element) % length);
-        if (newIndex < 0) {
-            return length + newIndex;
-        }
+        int newIndex = Math.floorMod(oldIndex + element, length);
         if (newIndex == 0 && oldIndex != 0) {
             return length;
         }
         return newIndex;
     }
-    private static void mix(int length, List<AtomicLong>  list, List<AtomicLong>  list2) {
+
+    private static void mix(int length, List<AtomicLong> list, List<AtomicLong> list2) {
         for (int i = 0; i < length; i++) {
             AtomicLong element = list2.get(i);
             int oldIndex = list.indexOf(element);
@@ -64,12 +60,15 @@ public class Day20 implements Puzzle {
             list.add(newIndex(element.get(), oldIndex, length), element);
         }
     }
-     private static void fillSheets(int[] inputSplit, List<AtomicLong>  list, List<AtomicLong>  list2, long key) {
+
+    private static List<AtomicLong> parseInput(String input, long key) {
+        int[] inputSplit = Stream.of(input.split("\n")).mapToInt(Integer::parseInt).toArray();
+        List<AtomicLong> list = new ArrayList<>();
         for (long j : inputSplit) {
             AtomicLong value = new AtomicLong(j * key);
             list.add(value);
-            list2.add(value);
         }
+        return list;
     }
 
     private static int index(int length, int step) {

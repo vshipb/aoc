@@ -1,8 +1,9 @@
 package io.qmbot.aoc.y2022;
 
 import io.qmbot.aoc.Puzzle;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
+import static io.qmbot.aoc.y2022.Day20.newIndex;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class Day20Test {
     Puzzle p = new Day20();
@@ -16,41 +17,32 @@ public class Day20Test {
             "4";
     String input2 = "1";
     @Test
-    public void newIndex() {
-        // 1
-        //2
-        //-3
-        //3
-        //-2
-        //0
-        //4
-        Assertions.assertEquals(Day20.newIndex(4, 5, 7), 3);
-
-        Assertions.assertEquals(Day20.newIndex(1, 0, 7), 1);
-        Assertions.assertEquals(Day20.newIndex(2, 0, 7), 2);
-        Assertions.assertEquals(Day20.newIndex(-3, 1, 7), 4);
-        Assertions.assertEquals(Day20.newIndex(3, 2, 7), 5);
-        Assertions.assertEquals(Day20.newIndex(-2, 2, 7), 6);
-        Assertions.assertEquals(Day20.newIndex(0, 3, 7), 3);
-
-        Assertions.assertEquals(Day20.newIndex(-2, 1, 7), 5);
-        Assertions.assertEquals(Day20.newIndex(1, 3, 7), 4);
-        Assertions.assertEquals(Day20.newIndex(0, 1, 2), 1);
-        Assertions.assertEquals(Day20.newIndex(0, 0, 2), 0);
-        Assertions.assertEquals(Day20.newIndex(0, 0, 1), 0);
-        Assertions.assertEquals(Day20.newIndex(-1, 0, 1), 0);
-        Assertions.assertEquals(Day20.newIndex(-50, 0, 1), 0);
-        Assertions.assertEquals(Day20.newIndex(50, 0, 1), 0);
-        Assertions.assertEquals(Day20.newIndex(1, 0, 1), 0);
+    public void testNewIndex() {
+        assertEquals(newIndex(4, 5, 7), 3);
+        assertEquals(newIndex(1, 0, 7), 1);
+        assertEquals(newIndex(2, 0, 7), 2);
+        assertEquals(newIndex(-3, 1, 7), 4);
+        assertEquals(newIndex(3, 2, 7), 5);
+        assertEquals(newIndex(-2, 2, 7), 6);
+        assertEquals(newIndex(0, 3, 7), 3);
+        assertEquals(newIndex(-2, 1, 7), 5);
+        assertEquals(newIndex(1, 3, 7), 4);
+        assertEquals(newIndex(0, 1, 2), 1);
+        assertEquals(newIndex(0, 0, 2), 0);
+        assertEquals(newIndex(0, 0, 1), 0);
+        assertEquals(newIndex(-1, 0, 1), 0);
+        assertEquals(newIndex(-50, 0, 1), 0);
+        assertEquals(newIndex(50, 0, 1), 0);
+        assertEquals(newIndex(1, 0, 1), 0);
     }
 
     @Test
     public void part1() {
-        Assertions.assertEquals("3", p.part1(input));
+        assertEquals("3", p.part1(input));
     }
 
     @Test
     public void part2() {
-        Assertions.assertEquals("1623178306", p.part2(input));
+        assertEquals("1623178306", p.part2(input));
     }
 }
