@@ -7,6 +7,8 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ForkJoinPool;
 
 public class Day19 implements Puzzle {
     @Override
@@ -149,20 +151,58 @@ public class Day19 implements Puzzle {
         }
     }
 
-    static int maxGeodes(int turn, Map<Robot, Integer> materials, Map<Robot, Integer> robots, Blueprint blueprint) {
-        if (turn == 0) {
-            return materials.get(blueprint.geodeRobot);
+    static Map<Robot, Integer> robotMap(int ore, int clay, int obsidian, int geode, Blueprint blueprint) {
+        Map<Robot, Integer> map = new HashMap<>();
+        map.put(blueprint.oreRobot, ore);
+        map.put(blueprint.clayRobot, clay);
+        map.put(blueprint.obsidianRobot, obsidian);
+        map.put(blueprint.geodeRobot, geode);
+        return map;
+    }
+
+    static int maxGeodesCanBuild(Map<Robot, Integer> materials, Robot geode) {
+        return geode.cost.entrySet().stream().mapToInt(e -> materials.get(e.getKey())/e.getValue()).min().orElseThrow();
+    }
+
+    static int maxGeodes(int turn, Map<Robot, Integer> materials, Map<Robot, Integer> robots, Blueprint blueprint, Map<Robot, Integer> previousMaterials, Map<Robot, Integer> previousBuild){
+        if (turn == 1) {
+            return materials.get(blueprint.geodeRobot) + robots.get(blueprint.geodeRobot);
         }
-        int max = 0;
-        for (Map<Robot, Integer> build : combinations(materials, blueprint)) {
+
+
+
+        List<Map<Robot, Integer>> combinations = turn > 2 ? combinations(materials, blueprint, previousMaterials, previousBuild) :
+            List.of(robotMap(0, 0, 0, maxGeodesCanBuild(materials, blueprint.geodeRobot), blueprint));
+        //System.out.println("turn: " + turn + " Combinations: " + combinations.size());
+        if (combinations.size() > 50) {
+            System.out.println(turn);
+        }
+        ForkJoinPool p = new ForkJoinPool(4);
+
+        return combinations.parallelStream().mapToInt(build -> {
             Map<Robot, Integer> m = materialsAfterBuild(materials, build);
             Map<Robot, Integer> r = new HashMap<>(robots);
             robots.forEach((robot, count) -> m.put(robot, m.get(robot) + count));
             build.forEach((rob, i) -> r.put(rob, r.get(rob) + i));
-            int geodes = maxGeodes(turn - 1, m, r, blueprint);
-            if (geodes > max) max = geodes;
-        }
-        return max;
+            return  maxGeodes(turn - 1, m, r, blueprint, materials, build);
+            }).max().orElseThrow();
+//        for (Map<Robot, Integer> build : combinations) {
+////            if (turn == 5) {
+////                System.out.println();
+////            }
+//
+//
+//            Map<Robot, Integer> m = materialsAfterBuild(materials, build);
+//            Map<Robot, Integer> r = new HashMap<>(robots);
+//            robots.forEach((robot, count) -> m.put(robot, m.get(robot) + count));
+//            build.forEach((rob, i) -> r.put(rob, r.get(rob) + i));
+//            int geodes = maxGeodes(turn - 1, m, r, blueprint, materials, build);
+//            if (geodes > max) {
+//                max = geodes;
+//            }
+//
+//        }
+//        return max;
     }
 
     static Map<Robot, Integer> materialsAfterBuild(Map<Robot, Integer> materials, Map<Robot, Integer> build) {
@@ -171,25 +211,27 @@ public class Day19 implements Puzzle {
         return result;
     }
 
-    static List<Map<Robot, Integer>> combinations(Map<Robot, Integer> materials, Blueprint blueprint) {
+    static List<Map<Robot, Integer>> combinations(Map<Robot, Integer> materials, Blueprint blueprint, Map<Robot, Integer> previousMaterials, Map<Robot, Integer> previousBuild) {
         int ore = 0;
         int clay = 0;
         int obsidian = 0;
         int geode = 0;
         List<Map<Robot, Integer>> combinations = new ArrayList<>();
-        while (canBuild(ore, clay, obsidian, geode, materials, blueprint)) {
-            clay = 0;
-            while (canBuild(ore, clay, obsidian, geode, materials, blueprint)) {
-                obsidian = 0;
-                while (canBuild(ore, clay, obsidian, geode, materials, blueprint)) {
-                    geode = 0;
-                    while (canBuild(ore, clay, obsidian, geode, materials, blueprint)) {
-                        Map<Robot, Integer> map = new HashMap<>();
-                        map.put(blueprint.oreRobot, ore);
-                        map.put(blueprint.clayRobot, clay);
-                        map.put(blueprint.obsidianRobot, obsidian);
-                        map.put(blueprint.geodeRobot, geode);
-                        combinations.add(map);
+        while (canBuild(ore, clay, obsidian, geode, materials, blueprint)
+            && (ore == 0 || !canBuild(previousBuild.get(blueprint.oreRobot) + 1, previousBuild.get(blueprint.clayRobot),
+            previousBuild.get(blueprint.obsidianRobot), previousBuild.get(blueprint.geodeRobot), previousMaterials, blueprint))) {
+            while (canBuild(ore, clay, obsidian, geode, materials, blueprint)
+                && (ore == 0 || !canBuild(previousBuild.get(blueprint.oreRobot), previousBuild.get(blueprint.clayRobot) + 1,
+                previousBuild.get(blueprint.obsidianRobot), previousBuild.get(blueprint.geodeRobot), previousMaterials, blueprint))) {
+
+                while (canBuild(ore, clay, obsidian, geode, materials, blueprint)
+                    && (ore == 0 || !canBuild(previousBuild.get(blueprint.oreRobot), previousBuild.get(blueprint.clayRobot),
+                    previousBuild.get(blueprint.obsidianRobot) + 1, previousBuild.get(blueprint.geodeRobot), previousMaterials, blueprint))) {
+
+                    while (canBuild(ore, clay, obsidian, geode, materials, blueprint)
+                        && (ore == 0 || !canBuild(previousBuild.get(blueprint.oreRobot), previousBuild.get(blueprint.clayRobot),
+                        previousBuild.get(blueprint.obsidianRobot), previousBuild.get(blueprint.geodeRobot) + 1, previousMaterials, blueprint))) {
+                          combinations.add(robotMap(ore,clay, obsidian, geode, blueprint));
                         geode++;
                     }
                     geode = 0;
@@ -211,17 +253,17 @@ public class Day19 implements Puzzle {
         Robot obsidianRobot = blueprint.obsidianRobot;
         Robot geodeRobot = blueprint.geodeRobot;
 
-        Map<Robot, Integer> requet = new HashMap<>();
-        requet.put(oreRobot, oreRobot.cost.get(oreRobot) * ore
+        Map<Robot, Integer> required = new HashMap<>();
+        required.put(oreRobot, oreRobot.cost.get(oreRobot) * ore
                 + clayRobot.cost.get(oreRobot) * clay
                 + obsidianRobot.cost.get(oreRobot) * obsidian
                 + geodeRobot.cost.get(oreRobot) * geode);
-        requet.put(clayRobot, obsidianRobot.cost.get(clayRobot) * obsidian);
-        requet.put(obsidianRobot, geodeRobot.cost.get(obsidianRobot) * geode);
-        requet.put(geodeRobot, 0);
+        required.put(clayRobot, obsidianRobot.cost.get(clayRobot) * obsidian);
+        required.put(obsidianRobot, geodeRobot.cost.get(obsidianRobot) * geode);
+        required.put(geodeRobot, 0);
 
         for (Robot robot : materials.keySet()) {
-            if (materials.get(robot) < requet.get(robot)) return false;
+            if (materials.get(robot) < required.get(robot)) return false;
         }
         return true;
     }
