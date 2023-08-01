@@ -7,6 +7,7 @@ import org.junit.jupiter.api.Test;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import static io.qmbot.aoc.y2022.Day19.robotMap;
 
@@ -93,10 +94,11 @@ public class Day19Test {
 
     @Test
     public void testMaxGeodes() throws ExecutionException, InterruptedException {
-        Day19.Blueprint blueprint = new Day19.Blueprint(    b01);
+        Day19.Blueprint blueprint = new Day19.Blueprint(    b2);
         Day19.Me me = new Day19.Me(blueprint);
+        AtomicInteger max = new AtomicInteger();
         int r = Day19.maxGeodes(24, me.materials, me.robots, blueprint,
-            robotMap(0, 0, 0, 0, blueprint), robotMap(0, 0, 0, 0, blueprint));
+            robotMap(0, 0, 0, 0, blueprint), robotMap(0, 0, 0, 0, blueprint), max);
         System.out.println(r);
     }
 
