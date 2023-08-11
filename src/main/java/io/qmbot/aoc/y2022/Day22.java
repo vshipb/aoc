@@ -9,108 +9,27 @@ public class Day22 implements Puzzle {
         String[] splitInput = input.split("\n\n");
         String[] lines = splitInput[0].split("\n");
         String directions = splitInput[1];
-
         int maxY = lines.length;
         int maxX = Arrays.stream(lines).map(String::length).max(Integer::compareTo).orElseThrow();
-
-        char[][] boardPoints = new char[maxY][maxX];
-
-        for (int y = 0; y < maxY; y++) {
-            for (int x = 0; x < maxX; x++) {
-                String line = lines[y];
-                boardPoints[y][x] = x < line.length() ? line.charAt(x) : ' ';
-            }
-        }
-
-        int size = 0;
-
-        for (int y = 0; y < maxY; y++) {
-            for (int x = 0; x < maxX; x++) {
-                if (boardPoints[y][x] != ' ') {
-                    size++;
-                }
-            }
-        }
-
-        size = (int) Math.sqrt(size / 6) - 1;
-        int numberSquare = 0;
-
-        Square[] squares = new Square[6];
-        int boardX;
-        int boardY = 0;
-        int boardSizeX = 0;
-        int boardSizeY = 0;
-
-        for (int y = 0; y < maxY; y++) {
-            boardX = 0;
-            for (int x = 0; x < maxX; x++) {
-                if (boardPoints[y][x] != ' ') {
-                    squares[numberSquare] = (new Square(size + 1, new Point(y, x), new Point(y + size, x + size),
-                            boardY, boardX));
-
-                    for (int j = 0; j <= size; j++) {
-                        for (int i = 0; i <= size; i++) {
-                            squares[numberSquare].points[j][i] = boardPoints[y + j][x + i];
-                        }
-                    }
-                    numberSquare++;
-                }
-                x = x + size;
-                boardX++;
-                boardSizeX = boardX;
-            }
-            boardY++;
-            boardSizeY = boardY;
-            y = y + size;
+        char[][] boardPoints = boardPoints(maxY, maxX, lines);
+        int size = size(maxY, maxX, boardPoints);
+        int boardSizeX;
+        int boardSizeY;
+        Square[] squares = squares(maxY, maxX, size, boardPoints);
+        if (maxX > maxY) {
+            boardSizeX = 4;
+            boardSizeY = 3;
+        } else {
+            boardSizeX = 3;
+            boardSizeY = 4;
         }
         Square[][] board = new Square[boardSizeY][boardSizeX];
-
         for (Square square : squares) {
             board[square.squareY][square.squareX] = square;
         }
-        Me me = new Me(0, 0);
-        for (int x = 0; x < boardSizeX; x++) {
-            if (board[0][x] != null) {
-                for (int squareX = 0; squareX <= size; squareX++) {
-                    if (squares[0].points[0][squareX] == '.') {
-                        me.point = new Point(0, squareX);
-                        me.boardSquare = new Point(0, x);
-                        break;
-                    }
-                }
-                break;
-            }
-        }
-
-        String number = "";
-        boolean isNumber;
-        int j;
-
-        for (int i = 0; i < directions.length(); i++) {
-            j = i;
-            char command = directions.charAt(i);
-            if (Character.isDigit(command)) {
-                isNumber = true;
-                while (isNumber && j < directions.length()) {
-                    number += directions.charAt(j);
-                    j++;
-                    if (j < directions.length()) {
-                        isNumber = Character.isDigit(directions.charAt(j));
-                    }
-                }
-                me.move2(Integer.parseInt(number), size + 1, board);
-                i = j - 1;
-                number = "";
-            } else {
-                me.round(command);
-            }
-        }
-        int row = (me.boardSquare.pointY * (size + 1)) + me.point.pointY + 1;
-        int column = (me.boardSquare.pointX * (size + 1)) + me.point.pointX + 1;
-        int facing = me.direction.ordinal();
-
-        int result = row * 1000 + column * 4 + facing;
-        return String.valueOf(result);
+        Me me = me(boardSizeX, size, board, squares);
+        movingPart1(directions, me, size, 1);
+        return result(me.boardSquare.pointY, me.boardSquare.pointX, size, me);
     }
 
     @Override
@@ -118,21 +37,85 @@ public class Day22 implements Puzzle {
         String[] splitInput = input.split("\n\n");
         String[] lines = splitInput[0].split("\n");
         String directions = splitInput[1];
-
         int maxY = lines.length;
         int maxX = Arrays.stream(lines).map(String::length).max(Integer::compareTo).orElseThrow();
+        char[][] boardPoints = boardPoints(maxY, maxX, lines);
+        int size = size(maxY, maxX, boardPoints);
+        int boardSizeX;
+        int boardSizeY;
+        Square[] squares = squares(maxY, maxX, size, boardPoints);
+        if (maxX > maxY) {
+            boardSizeX = 4;
+            boardSizeY = 3;
+        } else {
+            boardSizeX = 3;
+            boardSizeY = 4;
+        }
+        Square[][] board = new Square[boardSizeY][boardSizeX];
+        for (Square square : squares) {
+            board[square.squareY][square.squareX] = square;
+        }
+        changeMap(squares, boardSizeX);
+        Me me = me(boardSizeX, size, board, squares);
+        movingPart1(directions, me, size, 2);
+        return result(me.square.coordinateOnBoard.pointY, me.square.coordinateOnBoard.pointX, size, me);
+    }
 
-        char[][] boardPoints = new char[maxY][maxX];
-
-        for (int y = 0; y < maxY; y++) {
-            for (int x = 0; x < maxX; x++) {
-                String line = lines[y];
-                boardPoints[y][x] = x < line.length() ? line.charAt(x) : ' ';
+    void movingPart1(String directions, Me me, int size, int part) {
+        StringBuilder number = new StringBuilder();
+        boolean isNumber;
+        int j;
+        for (int i = 0; i < directions.length(); i++) {
+            j = i;
+            char command = directions.charAt(i);
+            if (Character.isDigit(command)) {
+                isNumber = true;
+                while (isNumber && j < directions.length()) {
+                    number.append(directions.charAt(j));
+                    j++;
+                    if (j < directions.length()) {
+                        isNumber = Character.isDigit(directions.charAt(j));
+                    }
+                }
+                if (part == 1) {
+                    me.move1(Integer.parseInt(number.toString()), size + 1);
+                } else {
+                    me.move2(Integer.parseInt(number.toString()), size + 1);
+                }
+                i = j - 1;
+                number = new StringBuilder();
+            } else {
+                me.round(command);
             }
         }
+    }
 
+    String result(int pointY, int pointX, int size, Me me) {
+        int row = pointY * (size + 1) + me.point.pointY + 1;
+        int column = pointX * (size + 1) + me.point.pointX + 1;
+        int facing = me.direction.ordinal();
+
+        return String.valueOf(row * 1000 + column * 4 + facing);
+    }
+
+    Me me(int boardSizeX, int size, Square[][] board, Square[] squares) {
+        Me me = new Me(0, 0, squares[0], board);
+        for (int x = 0; x < boardSizeX; x++) {
+            if (board[0][x] != null) {
+                for (int squareX = 0; squareX <= size; squareX++) {
+                    if (squares[0].points[0][squareX] == '.') {
+                        me.point = new Point(0, squareX);
+                        me.boardSquare = new Point(0, x);
+                        return me;
+                    }
+                }
+            }
+        }
+        return me;
+    }
+
+    int size(int maxY, int maxX, char[][] boardPoints) {
         int size = 0;
-
         for (int y = 0; y < maxY; y++) {
             for (int x = 0; x < maxX; x++) {
                 if (boardPoints[y][x] != ' ') {
@@ -140,155 +123,66 @@ public class Day22 implements Puzzle {
                 }
             }
         }
+        return (int) Math.sqrt(size / 6) - 1;
+    }
 
-        size = (int) Math.sqrt(size / 6) - 1;
-        int numberSquare = 0;
-
-        Square[] squares = new Square[6];
-        int boardX = 0;
-        int boardY = 0;
-        int boardSizeX = 0;
-        int boardSizeY = 0;
-
+    char[][] boardPoints(int maxY, int maxX, String[] lines) {
+        char[][] boardPoints = new char[maxY][maxX];
         for (int y = 0; y < maxY; y++) {
-            boardX = 0;
+            for (int x = 0; x < maxX; x++) {
+                String line = lines[y];
+                boardPoints[y][x] = x < line.length() ? line.charAt(x) : ' ';
+            }
+        }
+        return boardPoints;
+    }
+
+    Square[] squares(int maxY, int maxX, int size, char[][] boardPoints) {
+        Square[] squares = new Square[6];
+        int numberSquare = 0;
+        int boardY = 0;
+        for (int y = 0; y < maxY; y++) {
+            int boardX = 0;
             for (int x = 0; x < maxX; x++) {
                 if (boardPoints[y][x] != ' ') {
                     squares[numberSquare] = (new Square(size + 1, new Point(y, x), new Point(y + size, x + size),
                             boardY, boardX));
 
                     for (int j = 0; j <= size; j++) {
-                        for (int i = 0; i <= size; i++) {
-                            squares[numberSquare].points[j][i] = boardPoints[y + j][x + i];
-                        }
+                        if (size + 1 >= 0)
+                            System.arraycopy(boardPoints[y + j], x, squares[numberSquare].points[j], 0, size + 1);
                     }
                     numberSquare++;
                 }
                 x = x + size;
                 boardX++;
-                boardSizeX = boardX;
             }
             boardY++;
-            boardSizeY = boardY;
             y = y + size;
         }
-        Square[][] board = new Square[boardSizeY][boardSizeX];
-
-        for (Square square : squares) {
-            board[square.squareY][square.squareX] = square;
-        }
-
-        switch (boardX) {
-            case 3 -> {
-                squares[0].top = squares[5];
-                squares[0].right = squares[1];
-                squares[0].bottom = squares[2];
-                squares[0].left = squares[3];
-
-                squares[1].top = squares[5];
-                squares[1].right = squares[4];
-                squares[1].bottom = squares[2];
-                squares[1].left = squares[0];
-
-                squares[2].top = squares[0];
-                squares[2].right = squares[1];
-                squares[2].bottom = squares[4];
-                squares[2].left = squares[3];
-
-                squares[3].top = squares[2];
-                squares[3].right = squares[4];
-                squares[3].bottom = squares[5];
-                squares[3].left = squares[0];
-
-                squares[4].top = squares[2];
-                squares[4].right = squares[1];
-                squares[4].bottom = squares[5];
-                squares[4].left = squares[3];
-
-                squares[5].top = squares[3];
-                squares[5].right = squares[4];
-                squares[5].bottom = squares[1];
-                squares[5].left = squares[0];
-            }
-            case 4 -> {
-                squares[0].top = squares[1];
-                squares[0].right = squares[5];
-                squares[0].bottom = squares[3];
-                squares[0].left = squares[2];
-
-                squares[1].top = squares[0];
-                squares[1].right = squares[2];
-                squares[1].bottom = squares[4];
-                squares[1].left = squares[5];
-
-                squares[2].top = squares[0];
-                squares[2].right = squares[3];
-                squares[2].bottom = squares[4];
-                squares[2].left = squares[1];
-
-                squares[3].top = squares[0];
-                squares[3].right = squares[5];
-                squares[3].bottom = squares[4];
-                squares[3].left = squares[2];
-
-                squares[4].top = squares[3];
-                squares[4].right = squares[5];
-                squares[4].bottom = squares[1];
-                squares[4].left = squares[2];
-
-                squares[5].top = squares[3];
-                squares[5].right = squares[0];
-                squares[5].bottom = squares[1];
-                squares[5].left = squares[4];
-            }
-            default -> System.out.println("Wrong board");
-        }
-        Me me = new Me(0, 0, squares[0]);
-        for (int x = 0; x < boardSizeX; x++) {
-            if (board[0][x] != null) {
-                for (int squareX = 0; squareX <= size; squareX++) {
-                    if (squares[0].points[0][squareX] == '.') {
-                        me.point = new Point(0, squareX);
-                        me.boardSquare = new Point(0, x);
-                        break;
-                    }
-                }
-                break;
-            }
-        }
-
-        String number = "";
-        boolean isNumber;
-        int j;
-
-        for (int i = 0; i < directions.length(); i++) {
-            j = i;
-            char command = directions.charAt(i);
-            if (Character.isDigit(command)) {
-                isNumber = true;
-                while (isNumber && j < directions.length()) {
-                    number += directions.charAt(j);
-                    j++;
-                    if (j < directions.length()) {
-                        isNumber = Character.isDigit(directions.charAt(j));
-                    }
-                }
-                me.move(Integer.parseInt(number), size + 1);
-                i = j - 1;
-                number = "";
-            } else {
-                me.round(command);
-            }
-        }
-
-        int row = (me.square.coordinateOnBoard.pointY * (size + 1)) + me.point.pointY + 1;
-        int column = (me.square.coordinateOnBoard.pointX * (size + 1)) + me.point.pointX + 1;
-        int facing = me.direction.ordinal();
-
-        int result = row * 1000 + column * 4 + facing;
-        return String.valueOf(result);
+        return squares;
     }
 
+    void changeMap(Square[] squares, int boardX) {
+        int[][] connections;
+        switch (boardX) {
+            case 3 ->
+                    connections = new int[][]{{5, 1, 2, 3}, {5, 4, 2, 0}, {0, 1, 4, 3}, {2, 4, 5, 0}, {2, 1, 5, 3}, {3, 4, 1, 0}};
+            case 4 ->
+                    connections = new int[][]{{1, 5, 3, 2}, {2, 3, 4, 5}, {0, 2, 4, 1}, {5, 0, 4, 2}, {3, 5, 1, 2}, {3, 0, 1, 4}};
+            default -> {
+                System.out.println("Wrong board");
+                return;
+            }
+        }
+
+        for (int i = 0; i < 6; i++) {
+            squares[i].top = squares[connections[i][0]];
+            squares[i].right = squares[connections[i][1]];
+            squares[i].bottom = squares[connections[i][2]];
+            squares[i].left = squares[connections[i][3]];
+        }
+    }
 
     enum Direction {
         East(0, 1) {
@@ -407,23 +301,20 @@ public class Day22 implements Puzzle {
         private Direction direction;
         private Point boardSquare;
         private Square square;
+        private Square[][] board;
 
-        public Me(int y, int x) {
-            this.point = new Point(y, x);
-            this.direction = Direction.East;
-        }
-
-        public Me(int y, int x, Square square) {
+        public Me(int y, int x, Square square, Square[][] board) {
             this.point = new Point(y, x);
             this.direction = Direction.East;
             this.square = square;
+            this.board = board;
         }
 
-        private void move2(int move, int size, Square[][] board) {
+        private void move1(int move, int size) {
             for (int i = 0; i < move; i++) {
                 Point boardBefore = boardSquare;
                 Point next = direction.getPoint(point);
-                if (next.pointX == size || next.pointX == -1 || next.pointY == size || next.pointY == -1) {
+                if (isOutOfBounds(next, size)) {
                     next = direction.getPoint(point, size, size);
                     boardSquare = direction.getPoint(boardSquare, board);
                 }
@@ -438,24 +329,18 @@ public class Day22 implements Puzzle {
             }
         }
 
-        private void move(int move, int size) {
+
+        private void move2(int move, int size) {
             for (int i = 0; i < move; i++) {
                 Square squareBefore = square;
                 Point boardBefore = boardSquare;
                 Direction directionBefore = direction;
+
                 Point next = direction.getPoint(point);
-                if (next.pointX == size || next.pointX == -1 || next.pointY == size || next.pointY == -1) {
-                    switch (direction) {
-                        case North -> square = square.top;
-                        case East -> square = square.right;
-                        case South -> square = square.bottom;
-                        case West -> square = square.left;
-                        default -> System.out.println("wrong direction");
-                    }
+                if (isOutOfBounds(next, size)) {
+                    square = getNeighborSquare(square, direction);
                     round2(squareBefore, square);
                     next = direction.getPoint(point, size - 1, directionBefore);
-                    int b = 0;
-                    // boardSquare = square.;
                 }
 
                 switch (square.points[next.pointY][next.pointX]) {
@@ -466,6 +351,31 @@ public class Day22 implements Puzzle {
                         boardSquare = boardBefore;
                     }
                     default -> System.out.println("exception");
+                }
+            }
+        }
+
+        private boolean isOutOfBounds(Point point, int size) {
+            return point.pointX == size || point.pointX == -1 || point.pointY == size || point.pointY == -1;
+        }
+
+        private Square getNeighborSquare(Square square, Direction direction) {
+            switch (direction) {
+                case North -> {
+                    return square.top;
+                }
+                case East -> {
+                    return square.right;
+                }
+                case South -> {
+                    return square.bottom;
+                }
+                case West -> {
+                    return square.left;
+                }
+                default -> {
+                    System.out.println("wrong direction");
+                    return square;
                 }
             }
         }
