@@ -9,7 +9,7 @@ import java.nio.file.Path;
 public class Main {
     public static void main(String[] args) throws ClassNotFoundException, NoSuchMethodException, IOException,
             InvocationTargetException, IllegalAccessException, InstantiationException {
-        for (int i = 23; i < 24; i++) {
+        for (int i = 25; i < 26; i++) {
             String formatted = String.format("io.qmbot.aoc.y2022.Day%02d", i);
             Class cls = Class.forName(formatted);
             Puzzle p = (Puzzle) cls.getDeclaredConstructor().newInstance();
