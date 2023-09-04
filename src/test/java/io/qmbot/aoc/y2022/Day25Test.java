@@ -21,6 +21,13 @@ public class Day25Test {
             "122";
 
     @Test
+    public void addTest() {
+        Assertions.assertEquals("2", Day25.SNAFU.parse("1").add(Day25.SNAFU.parse("1")).toString());
+        Assertions.assertEquals("1=", Day25.SNAFU.parse("1").add(Day25.SNAFU.parse("2")).toString());
+        Assertions.assertEquals("1-", Day25.SNAFU.parse("1=").add(Day25.SNAFU.parse("1")).toString());
+
+    }
+    @Test
     public void part1() {
         Assertions.assertEquals("2=-1=0", p.part1(input));
     }
