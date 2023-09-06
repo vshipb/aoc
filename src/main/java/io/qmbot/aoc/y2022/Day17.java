@@ -10,75 +10,100 @@ import java.util.concurrent.atomic.AtomicInteger;
 public class Day17 implements Puzzle {
     @Override
     public String part1(String input) {
-        LimitedQueue<String[]> field = new LimitedQueue<>(100);
-        String trimmedInput = input.trim();
-        AtomicInteger added = new AtomicInteger(0);
-
-        for (int i = 0; i < 4; i++) {
-            String[] line = new String[7];
-            Arrays.fill(line, "0");
-            field.addLine(line);
-            added.getAndIncrement();
-        }
-
-        long countFigures = 2022;
-        int jetPatternPosition = 0;
-        int high;
-
-        long x = countFigures - 36;
-        long y = x / 35;
-        long z = x % 35;
-
-        z = countFigures - z;
-
-        for (long i = z; i < countFigures; i++) {
-            jetPatternPosition = createFigure(i, field, added).startFalling(field, trimmedInput, jetPatternPosition);
-        }
-
-        high = added.intValue() - (newStartY(field) + 4);
-        y = (y * 53) + 64;
-        y = y + high;
-        return String.valueOf(y);
+        Field field = new Field(input, 8000, 2022);
+        field.falling(field.countFigures);
+        int high = field.added.intValue() - (newStartY(field.field) + 4);
+        return String.valueOf(high);
     }
 
     @Override
     public String part2(String input) {
-        LimitedQueue<String[]> field = new LimitedQueue<>(100);
-        String trimmedInput = input.trim();
-        AtomicInteger added = new AtomicInteger(0);
+        Field f = new Field(input, 100, 10000);
+        f.falling(f.countFigures);
+        long iFirst = f.figuresBeforeCycle;
+        Field field = new Field(input, 100, 1_000_000_000_000L);
+        field.countCycles(iFirst, f.figuresForCycle);
+        field.falling(field.figuresLeftAfterCycles + iFirst);
+        return String.valueOf(field.findY(f.stringsForCycle));
+    }
 
+    static class Field {
+        long cyclesCount;
+        long figuresLeftAfterCycles;
+        LimitedQueue<String[]> field;
+        String trimmedInput;
+        AtomicInteger added = new AtomicInteger(0);
+        long countFigures;
+        int jetPatternPosition = 0;
+        int stringsBeforeCycle;
+        long stringsForCycle;
+        long figuresBeforeCycle = 0;
+        long figuresForCycle = 0;
+        String orient = "";
+
+        void falling(long count) {
+            for (long i = 0; i < count; i++) {
+                startFallingField(createFigure(i, field, added), i, added);
+            }
+        }
+
+        long findY(long aS) {
+            int high = added.intValue() - (newStartY(field) + 4);
+            cyclesCount = (cyclesCount * aS);
+            return cyclesCount + high;
+        }
+
+        void countCycles(long figureNumberFirst, long figureNumberSecond) {
+            long figures = countFigures - figureNumberFirst;
+            cyclesCount = figures / figureNumberSecond;
+            figuresLeftAfterCycles = figures % figureNumberSecond;
+        }
+
+        void startFallingField(Figure figure, long i, AtomicInteger added) {
+            boolean spaceForFalling = true;
+            while (spaceForFalling) {
+                figure.moveX(trimmedInput.charAt(jetPatternPosition), field);
+                jetPatternPosition++;
+                if (jetPatternPosition == trimmedInput.length()) {
+                    jetPatternPosition = 0;
+                    if (orient.isEmpty()) {
+                        orient = figure.name;
+                    } else if (orient.equals(figure.name) && figuresBeforeCycle == 0) {
+                        figuresBeforeCycle = i;
+                        stringsBeforeCycle = added.intValue();
+                    } else if (orient.equals(figure.name) && figuresForCycle == 0) {
+                        figuresForCycle = i - figuresBeforeCycle;
+                        stringsForCycle = added.intValue() - stringsBeforeCycle;
+                    }
+                }
+                spaceForFalling = figure.canMoveY(field);
+                if (spaceForFalling) {
+                    figure.moveY();
+                }
+            }
+            figure.draw(field);
+        }
+
+        public Field(String input, int queueSize, long countFigures) {
+            this.field = new LimitedQueue<>(queueSize);
+            this.trimmedInput = input.trim();
+            startFill(field, added);
+            this.countFigures = countFigures;
+        }
+    }
+
+    private static void startFill(LimitedQueue<String[]> field, AtomicInteger added) {
         for (int i = 0; i < 4; i++) {
             String[] line = new String[7];
             Arrays.fill(line, "0");
             field.addLine(line);
             added.getAndIncrement();
         }
-
-        long countFigures = 1_000_000_000_000L;
-        int jetPatternPosition = 0;
-        int high;
-
-        long x = countFigures - 36; //1753;
-        long y = x / 35; //1750;
-        long z = x % 35; //1750;
-
-        z = countFigures - z;
-
-        System.out.println(z);
-        for (long i = z; i < countFigures; i++) {
-            jetPatternPosition = createFigure(i, field, added).startFalling(field, trimmedInput, jetPatternPosition);
-        }
-
-        high = added.intValue() - (newStartY(field) + 4);
-        y = (y * 53) + 67;
-        y = y + high;
-        return String.valueOf(y);
     }
 
     private static Figure createFigure(long step, LimitedQueue<String[]> field, AtomicInteger removed) {
         Figure figure;
         int indexF = (int) (step % 5);
-
         switch (indexF) {
             case 0 -> {
                 fillField(field, 1, removed);
@@ -102,7 +127,6 @@ public class Day17 implements Puzzle {
             }
             default -> throw new IllegalArgumentException("Figure index " + indexF + " is not valid");
         }
-
         return figure;
     }
 
@@ -116,11 +140,7 @@ public class Day17 implements Puzzle {
     }
 
     private static void fillField(LimitedQueue<String[]> field, int figureHeight, AtomicInteger added) {
-        int plusPole;
-        int fix = newStartY(field);
-
-        plusPole = figureHeight - fix - 1;
-
+        int plusPole = figureHeight - newStartY(field) - 1;
         for (int i = 0; i < plusPole; i++) {
             String[] line = new String[7];
             Arrays.fill(line, "0");
@@ -140,103 +160,81 @@ public class Day17 implements Puzzle {
     }
 
     static class Figure {
-
+        String name;
         List<Point> figurePoints = new ArrayList<>();
+        boolean space = true;
 
-        public Figure(Point... points) {
+        public Figure(String name, Point... points) {
+            this.name = name;
             figurePoints.addAll(Arrays.asList(points));
         }
 
-
-        int startFalling(LimitedQueue<String[]> field, String jetPattern, int jetPatternPosition) {
-            boolean spaceForFalling = true;
-            while (spaceForFalling) {
-                boolean space = true;
-
-                switch (jetPattern.charAt(jetPatternPosition)) {
-                    case '<' -> {
-                        for (Point point : figurePoints) {
-                            if (point.pointX == 0 || !field.get(point.pointY)[point.pointX - 1].equals("0")) {
-                                space = false;
-                                break;
-                            }
-                        }
-                        if (space) {
-                            for (Point point : figurePoints) {
-                                point.pointX = point.pointX - 1;
-                            }
-                        }
-                    }
-                    case '>' -> {
-                        for (Point point : figurePoints) {
-                            if (point.pointX == 6 || !field.get(point.pointY)[point.pointX + 1].equals("0")) {
-                                space = false;
-                                break;
-                            }
-                        }
-                        if (space) {
-                            for (Point point : figurePoints) {
-                                point.pointX = point.pointX + 1;
-                            }
-                        }
-                    }
-                    default -> throw new IllegalArgumentException("Figure index "
-                            + jetPattern.charAt(jetPatternPosition) + " is not valid");
-                }
-                jetPatternPosition++;
-                if (jetPatternPosition == jetPattern.length()) {
-                    jetPatternPosition = 0;
-                }
-
-                for (Point point : figurePoints) {
-                    if (point.pointY + 1 == field.size() || field.get(point.pointY + 1)[point.pointX].equals("7")) {
-                        spaceForFalling = false;
-                        break;
-                    }
-                }
-
-                if (spaceForFalling) {
-                    for (Point point : figurePoints) {
-                        point.pointY = point.pointY + 1;
-                    }
-                }
-
-            }
+        void draw(LimitedQueue<String[]> field) {
             for (Point point : figurePoints) {
                 field.get(point.pointY)[point.pointX] = "7";
             }
+        }
 
-            return jetPatternPosition;
+        void moveY() {
+            for (Point point : figurePoints) {
+                point.pointY = point.pointY + 1;
+            }
+        }
+
+        boolean canMoveY(LimitedQueue<String[]> field) {
+            for (Point point : figurePoints) {
+                if (point.pointY + 1 == field.size() || field.get(point.pointY + 1)[point.pointX].equals("7")) {
+                    return false;
+                }
+            }
+            return true;
+        }
+
+        void moveX(char direction, LimitedQueue<String[]> field) {
+            int deltaX = (direction == '<') ? -1 : 1;
+            space = true;
+            for (Point point : figurePoints) {
+                int newX = point.pointX + deltaX;
+                if (newX < 0 || newX > 6 || !field.get(point.pointY)[newX].equals("0")) {
+                    space = false;
+                    break;
+                }
+            }
+            if (space) {
+                for (Point point : figurePoints) {
+                    point.pointX += deltaX;
+                }
+            }
         }
     }
 
     static Figure horizontal(int startY) {
-        return new Figure(new Point(startY, 2), new Point(startY, 3), new Point(startY, 4),
+        return new Figure("horizontal", new Point(startY, 2), new Point(startY, 3), new Point(startY, 4),
                 new Point(startY, 5));
     }
 
     static Figure plus(int startY) {
-        return new Figure(new Point(startY, 3), new Point(startY - 1, 3), new Point(startY - 2, 3),
+        return new Figure("plus", new Point(startY, 3), new Point(startY - 1, 3), new Point(startY - 2, 3),
                 new Point(startY - 1, 2), new Point(startY - 1, 4));
     }
 
     static Figure angle(int startY) {
-        return new Figure(new Point(startY, 4), new Point(startY - 1, 4), new Point(startY - 2, 4),
+        return new Figure("angle", new Point(startY, 4), new Point(startY - 1, 4), new Point(startY - 2, 4),
                 new Point(startY, 3), new Point(startY, 2));
     }
 
     static Figure vertical(int startY) {
-        return new Figure(new Point(startY, 2), new Point(startY - 1, 2), new Point(startY - 2, 2),
+        return new Figure("vertical", new Point(startY, 2), new Point(startY - 1, 2), new Point(startY - 2, 2),
                 new Point(startY - 3, 2));
     }
 
     static Figure square(int startY) {
-        return new Figure(new Point(startY, 2), new Point(startY, 3), new Point(startY - 1, 2),
+        return new Figure("square", new Point(startY, 2), new Point(startY, 3), new Point(startY - 1, 2),
                 new Point(startY - 1, 3));
     }
 
     public static class LimitedQueue<E> extends LinkedList<E> {
-        private int limit;
+        private final int limit;
 
         public LimitedQueue(int limit) {
             this.limit = limit;
