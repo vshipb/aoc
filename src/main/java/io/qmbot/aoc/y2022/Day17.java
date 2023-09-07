@@ -11,7 +11,7 @@ public class Day17 implements Puzzle {
     @Override
     public String part1(String input) {
         Field field = new Field(input, 8000, 2022);
-        field.falling(field.countFigures);
+        field.falling(field.figuresCount);
         int high = field.added.intValue() - (newStartY(field.field) + 4);
         return String.valueOf(high);
     }
@@ -19,12 +19,12 @@ public class Day17 implements Puzzle {
     @Override
     public String part2(String input) {
         Field f = new Field(input, 100, 10000);
-        f.falling(f.countFigures);
+        f.falling(f.figuresCount);
         long iFirst = f.figuresBeforeCycle;
         Field field = new Field(input, 100, 1_000_000_000_000L);
-        field.countCycles(iFirst, f.figuresForCycle);
+        field.countCycles(iFirst, f.figuresPerCycle);
         field.falling(field.figuresLeftAfterCycles + iFirst);
-        return String.valueOf(field.findY(f.stringsForCycle));
+        return String.valueOf(field.findHigh(f.linesPerCycle));
     }
 
     static class Field {
@@ -33,13 +33,13 @@ public class Day17 implements Puzzle {
         LimitedQueue<String[]> field;
         String trimmedInput;
         AtomicInteger added = new AtomicInteger(0);
-        long countFigures;
+        long figuresCount;
         int jetPatternPosition = 0;
-        int stringsBeforeCycle;
-        long stringsForCycle;
+        int linesBeforeCycle;
+        long linesPerCycle;
         long figuresBeforeCycle = 0;
-        long figuresForCycle = 0;
-        String orient = "";
+        long figuresPerCycle = 0;
+        String cycleFigureName = "";
 
         void falling(long count) {
             for (long i = 0; i < count; i++) {
@@ -47,14 +47,14 @@ public class Day17 implements Puzzle {
             }
         }
 
-        long findY(long aS) {
+        long findHigh(long linesPerCycle) {
             int high = added.intValue() - (newStartY(field) + 4);
-            cyclesCount = (cyclesCount * aS);
+            cyclesCount = (cyclesCount * linesPerCycle);
             return cyclesCount + high;
         }
 
         void countCycles(long figureNumberFirst, long figureNumberSecond) {
-            long figures = countFigures - figureNumberFirst;
+            long figures = figuresCount - figureNumberFirst;
             cyclesCount = figures / figureNumberSecond;
             figuresLeftAfterCycles = figures % figureNumberSecond;
         }
@@ -66,14 +66,14 @@ public class Day17 implements Puzzle {
                 jetPatternPosition++;
                 if (jetPatternPosition == trimmedInput.length()) {
                     jetPatternPosition = 0;
-                    if (orient.isEmpty()) {
-                        orient = figure.name;
-                    } else if (orient.equals(figure.name) && figuresBeforeCycle == 0) {
+                    if (cycleFigureName.isEmpty()) {
+                        cycleFigureName = figure.name;
+                    } else if (cycleFigureName.equals(figure.name) && figuresBeforeCycle == 0) {
                         figuresBeforeCycle = i;
-                        stringsBeforeCycle = added.intValue();
-                    } else if (orient.equals(figure.name) && figuresForCycle == 0) {
-                        figuresForCycle = i - figuresBeforeCycle;
-                        stringsForCycle = added.intValue() - stringsBeforeCycle;
+                        linesBeforeCycle = added.intValue();
+                    } else if (cycleFigureName.equals(figure.name) && figuresPerCycle == 0) {
+                        figuresPerCycle = i - figuresBeforeCycle;
+                        linesPerCycle = added.intValue() - linesBeforeCycle;
                     }
                 }
                 spaceForFalling = figure.canMoveY(field);
@@ -84,11 +84,11 @@ public class Day17 implements Puzzle {
             figure.draw(field);
         }
 
-        public Field(String input, int queueSize, long countFigures) {
+        public Field(String input, int queueSize, long figuresCount) {
             this.field = new LimitedQueue<>(queueSize);
             this.trimmedInput = input.trim();
             startFill(field, added);
-            this.countFigures = countFigures;
+            this.figuresCount = figuresCount;
         }
     }
 
