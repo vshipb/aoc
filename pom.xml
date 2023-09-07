@@ -55,6 +55,11 @@
             <scope>test</scope>
         </dependency>
 
+        <dependency>
+            <groupId>com.github.dpaukov</groupId>
+            <artifactId>combinatoricslib3</artifactId>
+            <version>3.3.3</version>
+        </dependency>
     </dependencies>
 
     <!-- To use the report goals in your POM or parent POM -->
