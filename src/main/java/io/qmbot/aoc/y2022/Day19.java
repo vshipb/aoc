@@ -1,12 +1,14 @@
 package io.qmbot.aoc.y2022;
 
 import io.qmbot.aoc.Puzzle;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.PriorityQueue;
 
 public class Day19 implements Puzzle {
     @Override
@@ -169,6 +171,51 @@ public class Day19 implements Puzzle {
         Map<Robot, Integer> result = new HashMap<>(materials);
         build.forEach((r, i) -> r.cost.forEach((r1, c) -> result.put(r1, result.get(r1) - c * i)));
         return result;
+    }
+    int star(Map<Robot, Integer> materials, Blueprint blueprint, int time) {
+        String start = "ore";
+        PriorityQueue<PriorityRobot> frontier = new PriorityQueue<>();
+        frontier.add(new PriorityRobot(start, 0, time, 0));
+        int newGain;
+        while (!frontier.isEmpty()) {
+            PriorityRobot current = frontier.poll();
+            List<String> canVisit;
+            for (String next : canVisit) {
+                time = current.remainingSteps - 1;
+                newGain = current.geode + (valves.get(next).flow * time);
+                List<String> needToOpen = needToOpen(current.needToOpen, next);
+                int priority = newGain + heuristic(valves, time, needToOpen, valves.get(next).destination);
+                frontier.add(PriorityRobot(next, priority, time, newGain));
+            }
+        }
+        return 0;
+    }
+    static int heuristic(Map<String, Day16.Valve> valves, int time, List<String> needToOpen, Map<String, Integer> destination) {
+//        int result = 0;
+//        for (String v : needToOpen) {
+//            int stepsToDestination = time - destination.get(v) - 1;
+//            result += Math.max(0, stepsToDestination) * valves.get(v).flow;
+//        }
+        return 1;
+    }
+    class PriorityRobot{
+        String name;
+        Robot robot;
+        long priority;
+        int remainingSteps;
+        int geode;
+
+        public PriorityRobot(String name, long priority, int remainingSteps, int geode) {
+            this.name = name;
+            this.priority = priority;
+            this.remainingSteps = remainingSteps;
+            this.geode = geode;
+        }
+
+        public PriorityRobot(Robot robot, long priority) {
+            this.robot = robot;
+            this.priority = priority;
+        }
     }
 
     static List<Map<Robot, Integer>> combinations(Map<Robot, Integer> materials, Blueprint blueprint) {
