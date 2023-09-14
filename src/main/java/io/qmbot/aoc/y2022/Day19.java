@@ -125,24 +125,26 @@ public class Day19 implements Puzzle {
                 if (next == null
                         || next.cost.entrySet().stream().allMatch(entry -> current.materials.get(entry.getKey()) >= entry.getValue())) {
                     time = current.remainingSteps - 1;
-                    newGeode = current.materials.get(blueprint.geodeRobot)
-                            + (current.robots.get(blueprint.geodeRobot) * time);
-                    int priority = newGeode + heuristic(current, next, blueprint);
-                    State newState = current.buildRobot(next, priority);
-                    if (!frontier.contains(newState)) {
-                        frontier.add(newState);
+                    if (time == 0) {
+                        int j = 0;
                     }
+                    newGeode = current.materials.get(blueprint.geodeRobot)
+                            + (current.robots.get(blueprint.geodeRobot) * current.remainingSteps);
+                    int priority = newGeode + heuristic(current, next, blueprint);
+                    State newState = current.buildRobot(next, priority, time);
+                    frontier.add(newState);
                 }
             }
         }
         throw new IllegalStateException();
     }
 
-    static int heuristic(State current, Robot next, Blueprint blueprint) {
+    static int heuristic(State before, Robot next, Blueprint blueprint) {
         Robot ore = blueprint.oreRobot;
         Robot clay = blueprint.clayRobot;
         Robot obsidian = blueprint.obsidianRobot;
         Robot geode = blueprint.geodeRobot;
+        State current = before.buildRobot(next, 0, 0);
         int time = current.remainingSteps;
         int timeClay = 0;
         int timeObsidian = 0;
@@ -170,8 +172,8 @@ public class Day19 implements Puzzle {
             }
         }
         time = time - timeClay - timeObsidian - timeGeode;
-        if (time < 0) {
-            int j = 0;
+        if (time <= 0) {
+            return 0;
         }
         return (time * (time - 1) / 2);
     }
@@ -181,18 +183,6 @@ public class Day19 implements Puzzle {
         Map<Robot, Integer> robots;
         int priority;
         int remainingSteps;
-
-        public boolean haveClay(Blueprint blueprint) {
-            return robots.get(blueprint.clayRobot) > 0;
-        }
-
-        public boolean haveObsidian(Blueprint blueprint) {
-            return robots.get(blueprint.obsidianRobot) > 0;
-        }
-
-        public boolean haveGeode(Blueprint blueprint) {
-            return robots.get(blueprint.geodeRobot) > 0;
-        }
 
         @Override
         public String toString() {
@@ -209,7 +199,7 @@ public class Day19 implements Puzzle {
             this.robots = robots;
         }
 
-        State buildRobot(Robot robot, int priority) {
+        State buildRobot(Robot robot, int priority, int remainingSteps) {
             Map<Robot, Integer> newRobots = new HashMap<>(robots);
             Map<Robot, Integer> newMaterials = new HashMap<>(materials);
             if (robot != null) {
@@ -217,7 +207,7 @@ public class Day19 implements Puzzle {
                 robot.cost.forEach((key, value) -> newMaterials.put(key, materials.get(key) - value));
             }
             robots.forEach((r, count) -> newMaterials.put(r, newMaterials.get(r) + count));
-            return new State(priority, remainingSteps - 1, newMaterials, newRobots);
+            return new State(priority, remainingSteps, newMaterials, newRobots);
         }
 
         @Override
