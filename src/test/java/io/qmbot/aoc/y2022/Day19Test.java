@@ -7,6 +7,8 @@ import org.junit.jupiter.api.Test;
 import java.util.ArrayList;
 import java.util.List;
 
+import static io.qmbot.aoc.y2022.Day19.timeBeforeRobot;
+
 public class Day19Test {
 
     Puzzle p = new Day19();
@@ -34,5 +36,12 @@ public class Day19Test {
     @Test
     public void part2(){
         Assertions.assertEquals("58", p.part2(input));
+    }
+
+    @Test
+    public void timeBeforeRobotTest() {
+        for (int i =0; i < 20; i++) {
+            System.out.println(timeBeforeRobot(1, 0, i) + " " + i);
+        }
     }
 }

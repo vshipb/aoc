@@ -1,6 +1,7 @@
 package io.qmbot.aoc.y2022;
 
 import io.qmbot.aoc.Puzzle;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -131,7 +132,7 @@ public class Day19 implements Puzzle {
                     newGeode = current.materials.get(blueprint.geodeRobot)
                             + (current.robots.get(blueprint.geodeRobot) * current.remainingSteps);
                     int priority = newGeode + heuristic(current, next, blueprint);
-                    State newState = current.buildRobot(next, priority, time);
+                    State newState = current.buildRobot(next, priority);
                     frontier.add(newState);
                 }
             }
@@ -144,38 +145,33 @@ public class Day19 implements Puzzle {
         Robot clay = blueprint.clayRobot;
         Robot obsidian = blueprint.obsidianRobot;
         Robot geode = blueprint.geodeRobot;
-        State current = before.buildRobot(next, 0, 0);
-        int time = current.remainingSteps;
+        State current = before.buildRobot(next, 0);
+        int time = before.remainingSteps;
         int timeClay = 0;
         int timeObsidian = 0;
         int timeGeode = 0;
         if (current.robots.get(clay) == 0) {
-            int have = current.materials.get(ore);
-            while (((timeClay * (timeClay - 1)) / 2) + have < clay.cost.get(ore)) {
-                timeClay++;
-            }
+            timeClay = timeBeforeRobot(current.robots.get(ore), current.materials.get(ore), clay.cost.get(ore));
         }
         if (current.robots.get(obsidian) == 0) {
-            int haveOre = current.materials.get(ore);
-            int haveClay = current.materials.get(clay);
-            while (((timeObsidian * (timeObsidian - 1)) / 2) + haveOre < obsidian.cost.get(ore)
-                    || ((timeObsidian * (timeObsidian - 1)) / 2) + haveClay < obsidian.cost.get(clay)) {
-                timeObsidian++;
-            }
+            timeObsidian = timeBeforeRobot(current.robots.get(clay), current.materials.get(clay), obsidian.cost.get(clay));
         }
         if (current.robots.get(geode) == 0) {
-            int haveOre = current.materials.get(ore);
-            int haveObsidian = current.materials.get(obsidian);
-            while (((timeGeode * (timeGeode - 1)) / 2) + haveOre < geode.cost.get(ore)
-                    || ((timeGeode * (timeGeode - 1)) / 2) + haveObsidian < geode.cost.get(obsidian)) {
-                timeGeode++;
-            }
+            timeGeode = timeBeforeRobot(current.robots.get(obsidian), current.materials.get(obsidian), geode.cost.get(obsidian));
         }
         time = time - timeClay - timeObsidian - timeGeode;
         if (time <= 0) {
             return 0;
         }
         return (time * (time - 1) / 2);
+    }
+
+    static int timeBeforeRobot(int haveRobots, int haveMaterials, int needMaterials) {
+        int time = 0;
+        while (((time * (time - 1)) / 2) + haveMaterials + (haveRobots * time) < needMaterials) {
+            time++;
+        }
+        return time + 1;
     }
 
     class State implements Comparable<State> {
@@ -199,7 +195,7 @@ public class Day19 implements Puzzle {
             this.robots = robots;
         }
 
-        State buildRobot(Robot robot, int priority, int remainingSteps) {
+        State buildRobot(Robot robot, int priority) {
             Map<Robot, Integer> newRobots = new HashMap<>(robots);
             Map<Robot, Integer> newMaterials = new HashMap<>(materials);
             if (robot != null) {
@@ -207,7 +203,7 @@ public class Day19 implements Puzzle {
                 robot.cost.forEach((key, value) -> newMaterials.put(key, materials.get(key) - value));
             }
             robots.forEach((r, count) -> newMaterials.put(r, newMaterials.get(r) + count));
-            return new State(priority, remainingSteps, newMaterials, newRobots);
+            return new State(priority, remainingSteps - 1, newMaterials, newRobots);
         }
 
         @Override
