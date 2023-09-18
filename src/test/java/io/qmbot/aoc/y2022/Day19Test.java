@@ -5,8 +5,11 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
+import static io.qmbot.aoc.y2022.Day19.star;
 import static io.qmbot.aoc.y2022.Day19.timeBeforeRobot;
 
 public class Day19Test {
@@ -34,8 +37,13 @@ public class Day19Test {
     }
 
     @Test
-    public void part2(){
-        Assertions.assertEquals("58", p.part2(input));
+    public void bestGeodesPart2(){
+        List<Day19.Blueprint> blueprintList = new ArrayList<>();
+        for (String string : input.split("\n")) {
+            blueprintList.add(new Day19.Blueprint(string));
+        }
+        Assertions.assertEquals(56, star(blueprintList.get(0), 32));
+        Assertions.assertEquals(62, star(blueprintList.get(1), 32));
     }
 
     @Test
