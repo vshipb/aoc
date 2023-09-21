@@ -249,10 +249,12 @@ public class Day19 implements Puzzle {
             Map<Robot, Integer> newRobots = new HashMap<>(robots);
             Map<Robot, Integer> newMaterials = new HashMap<>(materials);
             int time = 1;
+            int cost;
+            int have;
             for (Robot material : materials.keySet()) {
                 if (robot.cost.get(material) != null) {
-                    int cost = robot.cost.get(material);
-                    int have = newMaterials.get(material);
+                    cost = robot.cost.get(material);
+                    have = newMaterials.get(material);
                     while (cost > have) {
                         robots.forEach((r, count) -> newMaterials.put(r, newMaterials.get(r) + count));
                         have = newMaterials.get(material);
@@ -260,14 +262,20 @@ public class Day19 implements Puzzle {
                     }
                 }
             }
+
+            if(time > remainingSteps) {
+                Map<Robot, Integer> newMaterialsWithoutBuildRobot = new HashMap<>(materials);
+                robots.forEach((r, count) ->
+                        newMaterialsWithoutBuildRobot.put(r, newMaterialsWithoutBuildRobot.get(r) + (count * remainingSteps)));
+                return new State(0, newMaterialsWithoutBuildRobot, robots);
+            }
             robot.cost.forEach((key, value) -> newMaterials.put(key, newMaterials.get(key) - value));
             robots.forEach((r, count) -> newMaterials.put(r, newMaterials.get(r) + count));
 
             newRobots.put(robot, robots.get(robot) + 1);
-            time = remainingSteps - time;
-            if (time < 0)
-                return null;
-            return new State(time, newMaterials, newRobots);
+            int newTime = remainingSteps - time;
+
+            return new State(newTime, newMaterials, newRobots);
         }
 
         @Override
