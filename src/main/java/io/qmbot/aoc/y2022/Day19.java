@@ -12,18 +12,14 @@ import java.util.stream.Collectors;
 public class Day19 implements Puzzle {
     @Override
     public String part1(String input) {
-        List<Blueprint> blueprintList = Arrays.stream(input.split("\n")).map(Blueprint::new).toList();
-        return String.valueOf(blueprintList.stream().mapToInt(blueprint -> star(blueprint, 24) * blueprint.id).sum());
+        return String.valueOf(Arrays.stream(input.split("\n")).map(Blueprint::new)
+                .mapToInt(blueprint -> star(blueprint, 24) * blueprint.id).sum());
     }
 
     @Override
     public String part2(String input) {
-        List<Blueprint> blueprintList = Arrays.stream(input.split("\n")).map(Blueprint::new).toList();
-        int result = 1;
-        for (int i = 0; i < 3; i++) {
-            result *= star(blueprintList.get(i), 32);
-        }
-        return String.valueOf(result);
+        return String.valueOf(Arrays.stream(input.split("\n")).limit(3).map(Blueprint::new)
+                .mapToInt(b -> star(b, 32)).reduce((a, b) -> a * b).orElseThrow());
     }
 
     static class Blueprint {
