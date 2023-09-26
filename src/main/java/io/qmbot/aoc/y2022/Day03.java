@@ -2,15 +2,12 @@ package io.qmbot.aoc.y2022;
 
 import io.qmbot.aoc.Puzzle;
 
+import java.util.Arrays;
+
 public class Day03 implements Puzzle {
     @Override
     public String part1(String input) {
-        int sum = 0;
-
-        for (String string : input.split("\n")) {
-            sum = sum + priority(sameItems(string));
-        }
-        return String.valueOf(sum);
+        return String.valueOf(Arrays.stream(input.split("\n")).mapToInt(string -> priority(sameItem(string))).sum());
     }
 
     @Override
@@ -18,36 +15,33 @@ public class Day03 implements Puzzle {
         int sum = 0;
         String[] strings = input.split("\n");
         for (int i = 0; i < strings.length; i = i + 3) {
-            sum = sum + priority(sameItems2(strings[i], strings[i + 1], strings[i + 2]));
+            sum += priority(sameItem(strings[i], strings[i + 1], strings[i + 2]));
         }
         return String.valueOf(sum);
     }
 
-    public static String sameItems(String string) {
-        String part1 = string.substring(0, string.length() / 2);
-        String part2 = string.substring((string.length() / 2));
-        for (int i = 0; i < part1.length(); i++) {
-            if (part2.contains(part1.substring(i, i + 1))) {
-                return (part1.substring(i, i + 1));
+    private static char sameItem(String string) {
+        int half = string.length() / 2;
+        for (int i = 0; i < half; i++) {
+            char c = string.charAt(i);
+            if (string.lastIndexOf(c) >= half) {
+                return (c);
             }
         }
-        return "";
+        throw new IllegalArgumentException();
     }
 
-    public static String sameItems2(String one, String two, String three) {
+    private static char sameItem(String one, String two, String three) {
         for (int i = 0; i < one.length(); i++) {
-            if (two.contains(one.substring(i, i + 1)) & (three.contains(one.substring(i, i + 1)))) {
-                return (one.substring(i, i + 1));
+            char c = one.charAt(i);
+            if (two.indexOf(c) > -1 & (three.indexOf(c) > -1)) {
+                return c;
             }
         }
-        return "";
+        throw new IllegalArgumentException();
     }
 
-    public static int priority(String item) {
-        int i = item.getBytes()[0];
-        if (i > 96) {
-            return i - 96;
-        }
-        return i - 64 + 26;
+    private static int priority(char c) {
+        return c > 96 ? c - 96 : c - 64 + 26;
     }
 }
