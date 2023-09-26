@@ -3,9 +3,9 @@ package io.qmbot.aoc.y2022;
 import io.qmbot.aoc.Puzzle;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
-
 import java.util.ArrayList;
 import java.util.List;
+import static io.qmbot.aoc.y2022.Day19.star;
 
 public class Day19Test {
 
@@ -32,56 +32,12 @@ public class Day19Test {
     }
 
     @Test
-    public void part2(){
-        Assertions.assertEquals("58", p.part2(input));
-    }
-
-    @Test
-    public void testPriority() {
-        Day19.Blueprint blueprint = new Day19.Blueprint(input2);
-        Day19.Me me = new Day19.Me(blueprint);
-        List<Day19.Robot> toBuildRobots = new ArrayList<>();
-
-        for (int i = 0; i < 24; i++) {
-            while (me.priority(blueprint.geodeRobot, toBuildRobots) != null) {
-                Day19.Robot robotType = me.priority(blueprint.geodeRobot, toBuildRobots);
-                toBuildRobots.add(robotType);
-            }
-            for (Day19.Robot robotType : toBuildRobots) {
-                me.craft(me.materials, robotType);
-            }
-            me.robots.forEach((robot, count) -> me.materials.put(robot, me.materials.get(robot) + count));
-            for (Day19.Robot robotType : toBuildRobots) {
-                me.robots.put(robotType, me.robots.get(robotType) + 1);
-            }
-            System.out.println(i + "," + toBuildRobots);
-            System.out.println(me.robots);
-            System.out.println(me.materials);
-            toBuildRobots.clear();
+    public void bestGeodesPart2() {
+        List<Day19.Blueprint> blueprintList = new ArrayList<>();
+        for (String string : input.split("\n")) {
+            blueprintList.add(new Day19.Blueprint(string));
         }
-        System.out.println(me.materials.get(blueprint.geodeRobot));
-    }
-
-    @Test
-    public void testMaxGeodes() {
-        Day19.Blueprint blueprint = new Day19.Blueprint(input2);
-        Day19.Me me = new Day19.Me(blueprint);
-        System.out.println(Day19.maxGeodes(8, me.materials, me.robots, blueprint));
-    }
-
-    @Test
-    public void testCombinations() {
-        Day19.Blueprint blueprint = new Day19.Blueprint(input2);
-        Day19.Me me = new Day19.Me(blueprint);
-        me.materials.put(blueprint.oreRobot, 1);
-        System.out.println(Day19.combinations(me.materials, blueprint));
-    }
-
-    @Test
-    public void testCanBuild() {
-        Day19.Blueprint blueprint = new Day19.Blueprint(input2);
-        Day19.Me me = new Day19.Me(blueprint);
-        me.materials.put(blueprint.oreRobot, 1);
-        System.out.println(Day19.canBuild(0,0,1, 0,me.materials, blueprint));
+        Assertions.assertEquals(56, star(blueprintList.get(0), 32));
+        Assertions.assertEquals(62, star(blueprintList.get(1), 32));
     }
 }
