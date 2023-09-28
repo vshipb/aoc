@@ -5,6 +5,7 @@ import java.util.Arrays;
 
 public class Day04 implements Puzzle {
     private static final String REGEX = "[,-]";
+
     @Override
     public String part1(String input) {
         return String.valueOf(Arrays.stream(input.split(REGEX_NEW_LINE)).mapToInt(line -> {
