@@ -1,115 +1,25 @@
 package io.qmbot.aoc.y2022;
 
 import io.qmbot.aoc.Puzzle;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.PriorityQueue;
+import java.util.stream.Collectors;
 
 public class Day19 implements Puzzle {
     @Override
     public String part1(String input) {
-        List<Blueprint> blueprintList = new ArrayList<>();
-
-        for (String string : input.split("\n")) {
-            blueprintList.add(new Blueprint(string));
-        }
-
-        int time = 0;
-        List<Integer> bestGeode = new ArrayList<>();
-        List<Robot> toBuildRobots = new ArrayList<>();
-
-        for (Blueprint blueprint : blueprintList) {
-            Me me = new Me(blueprint);
-            List<Robot> robotTypes = Arrays.asList(blueprint.oreRobot, blueprint.clayRobot, blueprint.obsidianRobot, blueprint.geodeRobot);
-            while (time < 24) {
-                int k = 0;
-                //Robot robotType = me.priority(blueprint.geodeRobot);
-                while (me.priority(blueprint.geodeRobot, toBuildRobots) != null) {
-                    Robot robotType = me.priority(blueprint.geodeRobot, toBuildRobots);
-                    toBuildRobots.add(robotType);
-                }
-
-                //if (robotType != null) {
-                for (Robot robotType : toBuildRobots) {
-                    me.craft(me.materials, robotType);
-                }
-                //}
-                me.robots.forEach((robot, count) -> me.materials.put(robot, me.materials.get(robot) + count));
-                //if (robotType != null) {
-                for (Robot robotType : toBuildRobots) {
-                    me.robots.put(robotType, me.robots.get(robotType) + 1);
-                }
-                //}
-                toBuildRobots.clear();
-                time++;
-            }
-            bestGeode.add(me.materials.get(robotTypes.get(3)));
-            time = 0;
-        }
-        int j = 0;
-        return "";
+        return String.valueOf(Arrays.stream(input.split("\n")).map(Blueprint::new)
+                .mapToInt(blueprint -> star(blueprint, 24) * blueprint.id).sum());
     }
 
     @Override
     public String part2(String input) {
-        return "";
-    }
-
-    static class Me {
-        Map<Robot, Integer> robots = new HashMap<>();
-        Map<Robot, Integer> materials = new HashMap<>();
-
-        public Me(Blueprint blueprint) {
-            this.robots.put(blueprint.oreRobot, 1);
-            this.robots.put(blueprint.clayRobot, 0);
-            this.robots.put(blueprint.obsidianRobot, 0);
-            this.robots.put(blueprint.geodeRobot, 0);
-
-            this.materials.put(blueprint.oreRobot, 0);
-            this.materials.put(blueprint.clayRobot, 0);
-            this.materials.put(blueprint.obsidianRobot, 0);
-            this.materials.put(blueprint.geodeRobot, 0);
-        }
-
-        boolean isEnoughMaterials(Robot robot, List<Robot> toBuildRobots) {
-            Map<Robot, Integer> materials = new HashMap<>(this.materials);
-            for (Robot robot1 : toBuildRobots) {
-                craft(materials, robot1);
-            }
-            return robot.cost.entrySet().stream().allMatch(entry -> materials.get(entry.getKey()) >= entry.getValue());
-        }
-
-        Robot needRobot(Robot robot, List<Robot> toBuildRobots) {
-            Map<Robot, Integer> materials = new HashMap<>(this.materials);
-            for (Robot robot1 : toBuildRobots) {
-                craft(materials, robot1);
-            }
-            for (Robot material : robot.cost.keySet()) {
-                int m = (int) toBuildRobots.stream().filter(r -> r.equals(material)).count();
-                if (materials.get(material) + (robots.get(material) * 2) + m < robot.cost.get(material)) {
-                    return material;
-                }
-            }
-            return null;
-        }
-
-        void craft(Map<Robot, Integer> materials, Robot robot) {
-            robot.cost.forEach((key, value) -> materials.put(key, materials.get(key) - value));
-        }
-
-        Robot priority(Robot robot, List<Robot> toBuildRobots) {
-            for (int i = 0; i < 4; i++) {
-                if (robot == null) return null;
-                if (isEnoughMaterials(robot, toBuildRobots)) {
-                    return robot;
-                }
-                robot = needRobot(robot, toBuildRobots);
-            }
-            return null;
-        }
+        return String.valueOf(Arrays.stream(input.split("\n")).limit(3).map(Blueprint::new)
+                .mapToInt(b -> star(b, 32)).reduce((a, b) -> a * b).orElseThrow());
     }
 
     static class Blueprint {
@@ -118,6 +28,7 @@ public class Day19 implements Puzzle {
         Robot clayRobot;
         Robot obsidianRobot;
         Robot geodeRobot;
+        List<Robot> robots;
 
         public Blueprint(String string) {
             String[] words = string.split(" ");
@@ -132,97 +43,152 @@ public class Day19 implements Puzzle {
             this.geodeRobot = new Robot("geode");
             geodeRobot.cost.put(oreRobot, Integer.parseInt(words[27]));
             geodeRobot.cost.put(obsidianRobot, Integer.parseInt(words[30]));
+            this.robots = List.of(oreRobot, clayRobot, obsidianRobot, geodeRobot);
+            needMaterials();
+        }
+
+        private void needMaterials() {
+            for (Robot material : robots) {
+                for (Robot robot : robots) {
+                    int materialNeed = material.need;
+                    if (robot.cost.get(material) != null) {
+                        int costMaterial = robot.cost.get(material);
+                        if (materialNeed < costMaterial) {
+                            material.need = costMaterial;
+                        }
+                    }
+                }
+            }
+            geodeRobot.need = Integer.MAX_VALUE;
         }
     }
 
     static class Robot {
         @Override
         public String toString() {
-            return name + "{" + "cost=" + cost.values() + '}';
+            return name;
         }
 
         Map<Robot, Integer> cost = new LinkedHashMap<>();
         String name;
+        int need = 0;
 
         public Robot(String name) {
             this.name = name;
         }
     }
 
-    static int maxGeodes(int turn, Map<Robot, Integer> materials, Map<Robot, Integer> robots, Blueprint blueprint) {
-        if (turn == 0) {
-            return materials.get(blueprint.geodeRobot);
-        }
-        int max = 0;
-        for (Map<Robot, Integer> build : combinations(materials, blueprint)) {
-            Map<Robot, Integer> m = materialsAfterBuild(materials, build);
-            Map<Robot, Integer> r = new HashMap<>(robots);
-            robots.forEach((robot, count) -> m.put(robot, m.get(robot) + count));
-            build.forEach((rob, i) -> r.put(rob, r.get(rob) + i));
-            int geodes = maxGeodes(turn - 1, m, r, blueprint);
-            if (geodes > max) max = geodes;
-        }
-        return max;
-    }
-
-    static Map<Robot, Integer> materialsAfterBuild(Map<Robot, Integer> materials, Map<Robot, Integer> build) {
-        Map<Robot, Integer> result = new HashMap<>(materials);
-        build.forEach((r, i) -> r.cost.forEach((r1, c) -> result.put(r1, result.get(r1) - c * i)));
-        return result;
-    }
-
-    static List<Map<Robot, Integer>> combinations(Map<Robot, Integer> materials, Blueprint blueprint) {
-        int ore = 0;
-        int clay = 0;
-        int obsidian = 0;
-        int geode = 0;
-        List<Map<Robot, Integer>> combinations = new ArrayList<>();
-        while (canBuild(ore, clay, obsidian, geode, materials, blueprint)) {
-            clay = 0;
-            while (canBuild(ore, clay, obsidian, geode, materials, blueprint)) {
-                obsidian = 0;
-                while (canBuild(ore, clay, obsidian, geode, materials, blueprint)) {
-                    geode = 0;
-                    while (canBuild(ore, clay, obsidian, geode, materials, blueprint)) {
-                        Map<Robot, Integer> map = new HashMap<>();
-                        map.put(blueprint.oreRobot, ore);
-                        map.put(blueprint.clayRobot, clay);
-                        map.put(blueprint.obsidianRobot, obsidian);
-                        map.put(blueprint.geodeRobot, geode);
-                        combinations.add(map);
-                        geode++;
-                    }
-                    geode = 0;
-                    obsidian++;
-                }
-                obsidian = 0;
-                clay++;
+    static int star(Blueprint blueprint, int time) {
+        PriorityQueue<PriorityState> frontier = new PriorityQueue<>();
+        frontier.add(new PriorityState(State.createInitial(blueprint, time), 0));
+        int newGeode;
+        while (!frontier.isEmpty()) {
+            PriorityState current = frontier.poll();
+            if (current.state.remainingSteps == 0) {
+                return current.state.materials.get(blueprint.geodeRobot);
             }
-            clay = 0;
-            ore++;
+            List<Robot> needBuild = needBuildRobots(current.state);
+            for (Robot next : needBuild) {
+                newGeode = current.state.materials.get(blueprint.geodeRobot)
+                        + (current.state.robots.get(blueprint.geodeRobot) * current.state.remainingSteps);
+                State state = current.state.buildRobot(next);
+                int priority = newGeode + heuristic(state);
+                PriorityState newState = new PriorityState(state, priority);
+                if (newState.state != null) {
+                    frontier.add(newState);
+                }
+            }
         }
-        return combinations;
+        throw new IllegalStateException();
     }
 
-    static boolean canBuild(int ore, int clay, int obsidian, int geode, Map<Robot, Integer> materials, Blueprint blueprint) {
-        if (ore > 2 || clay > 2 || obsidian > 2) return false;
-        Robot oreRobot = blueprint.oreRobot;
-        Robot clayRobot = blueprint.clayRobot;
-        Robot obsidianRobot = blueprint.obsidianRobot;
-        Robot geodeRobot = blueprint.geodeRobot;
+    static List<Robot> needBuildRobots(State current) {
+        return current.robots.keySet().stream().filter(r -> r.need > current.robots.get(r))
+                .filter(r -> r.cost.entrySet().stream().allMatch((e) -> current.robots.get(e.getKey()) > 0)).collect(Collectors.toList());
+    }
 
-        Map<Robot, Integer> requet = new HashMap<>();
-        requet.put(oreRobot, oreRobot.cost.get(oreRobot) * ore
-                + clayRobot.cost.get(oreRobot) * clay
-                + obsidianRobot.cost.get(oreRobot) * obsidian
-                + geodeRobot.cost.get(oreRobot) * geode);
-        requet.put(clayRobot, obsidianRobot.cost.get(clayRobot) * obsidian);
-        requet.put(obsidianRobot, geodeRobot.cost.get(obsidianRobot) * geode);
-        requet.put(geodeRobot, 0);
 
-        for (Robot robot : materials.keySet()) {
-            if (materials.get(robot) < requet.get(robot)) return false;
+    static int heuristic(State current) {
+        int time = current.remainingSteps;
+        return (time * (time + 1) / 2);
+    }
+
+    static class PriorityState implements Comparable<PriorityState> {
+        State state;
+        int priority;
+
+        public PriorityState(State state, int priority) {
+            this.state = state;
+            this.priority = priority;
         }
-        return true;
+
+        @Override
+        public int compareTo(PriorityState o) {
+            return -Integer.compare(this.priority, o.priority);
+        }
+
+    }
+
+    static class State {
+        Map<Robot, Integer> materials;
+        Map<Robot, Integer> robots;
+        int remainingSteps;
+
+        @Override
+        public String toString() {
+            return "State{"
+                    + "robots=" + robots
+                    + ", remainingSteps=" + (remainingSteps) + '}';
+        }
+
+        static State createInitial(Blueprint blueprint, int remainingSteps) {
+            Map<Robot, Integer> materials = new HashMap<>();
+            Map<Robot, Integer> robots = new HashMap<>();
+            robots.put(blueprint.oreRobot, 1);
+            robots.put(blueprint.clayRobot, 0);
+            robots.put(blueprint.obsidianRobot, 0);
+            robots.put(blueprint.geodeRobot, 0);
+
+            materials.put(blueprint.oreRobot, 0);
+            materials.put(blueprint.clayRobot, 0);
+            materials.put(blueprint.obsidianRobot, 0);
+            materials.put(blueprint.geodeRobot, 0);
+            return new State(remainingSteps, materials, robots);
+        }
+
+        private State(int remainingSteps, Map<Robot, Integer> materials, Map<Robot, Integer> robots) {
+            this.remainingSteps = remainingSteps;
+            this.materials = materials;
+            this.robots = robots;
+        }
+
+        State buildRobot(Robot robot) {
+            Map<Robot, Integer> newRobots = new HashMap<>(robots);
+            Map<Robot, Integer> newMaterials = new HashMap<>(materials);
+            int time = 1;
+            int cost;
+            int have;
+            for (Robot material : materials.keySet()) {
+                if (robot.cost.get(material) != null) {
+                    cost = robot.cost.get(material);
+                    have = newMaterials.get(material);
+                    while (cost > have) {
+                        robots.forEach((r, count) -> newMaterials.put(r, newMaterials.get(r) + count));
+                        have = newMaterials.get(material);
+                        time++;
+                    }
+                }
+            }
+            if (time > remainingSteps) {
+                Map<Robot, Integer> newMaterialsWithoutBuildRobot = new HashMap<>(materials);
+                robots.forEach((r, count) ->
+                        newMaterialsWithoutBuildRobot.put(r, newMaterialsWithoutBuildRobot.get(r) + (count * remainingSteps)));
+                return new State(0, newMaterialsWithoutBuildRobot, robots);
+            }
+            robot.cost.forEach((key, value) -> newMaterials.put(key, newMaterials.get(key) - value));
+            robots.forEach((r, count) -> newMaterials.put(r, newMaterials.get(r) + count));
+            newRobots.put(robot, robots.get(robot) + 1);
+            return new State(remainingSteps - time, newMaterials, newRobots);
+        }
     }
 }
