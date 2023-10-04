@@ -10,16 +10,28 @@ public class Day05 implements Puzzle {
     public String part1(String input) {
         String[] splitted = input.split(REGEX_NEW_LINE + REGEX_NEW_LINE);
         List<LinkedList<Character>> stacksOfCrates = stacksOfCrates(splitted[0].lines().toList());
-        crateMover9000(stacksOfCrates, splitted[1].lines().toList());
+        crateMover9000(stacksOfCrates, splitted[1].lines().toList(), ((lines, from, to, count) -> {
+            for (int i = 0; i < count; i++) {
+                lines.get(to).push(lines.get(from).pop());
+            }
+        }));
         return result(stacksOfCrates);
     }
 
     @Override
     public String part2(String input) {
         String[] splitted = input.split(REGEX_NEW_LINE + REGEX_NEW_LINE);
-        List<LinkedList<Character>> l = stacksOfCrates(splitted[0].lines().toList());
-        crateMover9001(l, splitted[1].lines().toList());
-        return result(l);
+        List<LinkedList<Character>> stacksOfCrates = stacksOfCrates(splitted[0].lines().toList());
+        crateMover9001(stacksOfCrates, splitted[1].lines().toList(), ((lines, from, to, count) -> {
+            LinkedList<Character> reserve = new LinkedList<>();
+            for (int i = 0; i < count; i++) {
+                reserve.push(lines.get(from).pop());
+            }
+            for (int i = 0; i < count; i++) {
+                lines.get(to).push(reserve.pop());
+            }
+        }));
+        return result(stacksOfCrates);
     }
 
     private static String result(List<LinkedList<Character>> stacksOfCrates) {
@@ -47,31 +59,27 @@ public class Day05 implements Puzzle {
         return stacks;
     }
 
-    private static void crateMover9000(List<LinkedList<Character>> lines, List<String> moves) {
+    private static void crateMover9000(List<LinkedList<Character>> lines, List<String> moves, Mover mover) {
         for (String string : moves) {
             String[] stringSplit = string.split(" ");
-            int move = Integer.parseInt(stringSplit[1]);
+            int count = Integer.parseInt(stringSplit[1]);
             int from = Integer.parseInt(stringSplit[3]) - 1;
             int to = Integer.parseInt(stringSplit[5]) - 1;
-            for (int i = 0; i < move; i++) {
-                lines.get(to).push(lines.get(from).pop());
-            }
+            mover.move(lines, from, to, count);
         }
     }
 
-    private static void crateMover9001(List<LinkedList<Character>> lines, List<String> moves) {
+    private static void crateMover9001(List<LinkedList<Character>> lines, List<String> moves, Mover mover) {
         for (String string : moves) {
             String[] stringSplit = string.split(" ");
-            LinkedList<Character> reserve = new LinkedList<>();
-            int move = Integer.parseInt(stringSplit[1]);
+            int count = Integer.parseInt(stringSplit[1]);
             int from = Integer.parseInt(stringSplit[3]) - 1;
             int to = Integer.parseInt(stringSplit[5]) - 1;
-            for (int i = 0; i < move; i++) {
-                reserve.push(lines.get(from).pop());
-            }
-            for (int i = 0; i < move; i++) {
-                lines.get(to).push(reserve.pop());
-            }
+            mover.move(lines, from, to, count);
         }
+    }
+
+    interface Mover {
+        void move(List<LinkedList<Character>> lines, int from, int to, int count);
     }
 }
