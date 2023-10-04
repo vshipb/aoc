@@ -13,7 +13,7 @@ public class Day06 implements Puzzle {
         return markerPosition(input, 14);
     }
 
-    private static String markerPosition(String input, int markerSize){
+    private static String markerPosition(String input, int markerSize) {
         for (int i = markerSize - 1; i < input.length(); i++) {
             if (input.substring(i - markerSize + 1, i + 1).chars().distinct().count() == markerSize)
                 return String.valueOf(i + 1);
