@@ -1,89 +1,73 @@
 package io.qmbot.aoc.y2022;
 
 import io.qmbot.aoc.Puzzle;
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
 public class Day05 implements Puzzle {
     @Override
     public String part1(String input) {
-        String[] splitted = input.split("\n\n");
-        List<String> strings = splitted[0].lines().toList();
-        String str = strings.get(strings.size() - 1).replaceAll(" ", "");
-        int stacks = Character.getNumericValue(str.charAt(str.length() - 1));
-        LinkedList<Character>[] l = new LinkedList[stacks];
-        for (int i = 0; i < stacks; i++) {
-            l[i] = new LinkedList<>();
-            int a = 1 + (i * 4);
-            for (int j = strings.size() - 2; j > -1; j--) {
-                String string = strings.get(j);
-                if (string.length() < a || string.charAt(a) == ' ') {
-                    break;
-                }
-                l[i].push(string.charAt(a));
+        String[] split = input.split(REGEX_EMPTY_LINE);
+        List<LinkedList<Character>> stacksOfCrates = stacksOfCrates(split[0].lines().toList());
+        move(stacksOfCrates, split[1].lines().toList(), ((lines, from, to, count) -> {
+            for (int i = 0; i < count; i++) {
+                lines.get(to).push(lines.get(from).pop());
             }
-        }
-        List<String> moves = splitted[1].lines().toList();
-        for (String move : moves) {
-            moving(l, move);
-        }
-        String result = "";
-        for (LinkedList<Character> rl : l) {
-            result = result + rl.getFirst();
-        }
-        return result;
+        }));
+        return result(stacksOfCrates);
     }
 
     @Override
     public String part2(String input) {
-        String[] splitted = input.split("\n\n");
-        List<String> strings = splitted[0].lines().toList();
-        String str = strings.get(strings.size() - 1).replaceAll(" ", "");
-        int stacks = Character.getNumericValue(str.charAt(str.length() - 1));
-        LinkedList<Character>[] l = new LinkedList[stacks];
-        for (int i = 0; i < stacks; i++) {
-            l[i] = new LinkedList<>();
-            int a = 1 + (i * 4);
-            for (int j = strings.size() - 2; j > -1; j--) {
-                String string = strings.get(j);
-                if (string.length() < a || string.charAt(a) == ' ') {
-                    break;
-                }
-                l[i].push(string.charAt(a));
+        String[] split = input.split(REGEX_EMPTY_LINE);
+        List<LinkedList<Character>> stacksOfCrates = stacksOfCrates(split[0].lines().toList());
+        move(stacksOfCrates, split[1].lines().toList(), ((lines, from, to, count) -> {
+            LinkedList<Character> reserve = new LinkedList<>();
+            for (int i = 0; i < count; i++) {
+                reserve.push(lines.get(from).pop());
             }
-        }
-        List<String> moves = splitted[1].lines().toList();
-        for (String move : moves) {
-            moving9001(l, move);
-        }
-        String result = "";
-        for (LinkedList<Character> rl : l) {
-            result = result + rl.getFirst();
-        }
-        return result;
+            reserve.forEach(r -> lines.get(to).push(r));
+        }));
+        return result(stacksOfCrates);
     }
 
-    private static void moving(LinkedList[] lines, String move1) {
-        String[] move3 = move1.split(" ");
-        int move = Integer.parseInt(move3[1]);
-        int from = Integer.parseInt(move3[3]) - 1;
-        int to = Integer.parseInt(move3[5]) - 1;
-        for (int i = 0; i < move; i++) {
-            lines[to].push(lines[from].pop());
+    private static String result(List<LinkedList<Character>> stacksOfCrates) {
+        StringBuilder result = new StringBuilder();
+        for (LinkedList<Character> rl : stacksOfCrates) {
+            result.append(rl.getFirst());
+        }
+        return result.toString();
+    }
+
+    private static List<LinkedList<Character>> stacksOfCrates(List<String> strings) {
+        String stringWithStacks = strings.get(strings.size() - 1).trim();
+        int countOfStacks = Character.getNumericValue(stringWithStacks.charAt(stringWithStacks.length() - 1));
+        List<LinkedList<Character>> stacks = new ArrayList<>();
+        for (int i = 0; i < countOfStacks; i++) {
+            LinkedList<Character> stack = new LinkedList<>();
+            int idx = 1 + (i * 4);
+            for (int j = strings.size() - 2; j >= 0; j--) {
+                String current = strings.get(j);
+                if (idx >= current.length() || current.charAt(idx) == ' ') break;
+                stack.push(current.charAt(idx));
+            }
+            stacks.add(stack);
+        }
+        return stacks;
+    }
+
+    private static void move(List<LinkedList<Character>> lines, List<String> moves, Mover mover) {
+        for (String string : moves) {
+            String[] stringSplit = string.split(" ");
+            int count = Integer.parseInt(stringSplit[1]);
+            int from = Integer.parseInt(stringSplit[3]) - 1;
+            int to = Integer.parseInt(stringSplit[5]) - 1;
+            mover.move(lines, from, to, count);
         }
     }
 
-    private static void moving9001(LinkedList<Character>[] lines, String move1) {
-        String[] move3 = move1.split(" ");
-        LinkedList<Character> reserve = new LinkedList<>();
-        int move = Integer.parseInt(move3[1]);
-        int from = Integer.parseInt(move3[3]) - 1;
-        int to = Integer.parseInt(move3[5]) - 1;
-        for (int i = 0; i < move; i++) {
-            reserve.push(lines[from].pop());
-        }
-        for (int i = 0; i < move; i++) {
-            lines[to].push(reserve.pop());
-        }
+    interface Mover {
+        void move(List<LinkedList<Character>> lines, int from, int to, int count);
     }
 }
