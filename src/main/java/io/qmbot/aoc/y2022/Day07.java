@@ -2,92 +2,63 @@ package io.qmbot.aoc.y2022;
 
 import io.qmbot.aoc.Puzzle;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-import java.util.Objects;
+import java.util.stream.Stream;
 
 public class Day07 implements Puzzle {
     @Override
     public String part1(String input) {
-        Directory directory = new Directory(null, null);
-        Directory current = directory;
-        Map<String, Directory> dirByName = new HashMap<>();
-        for (String string : input.split("\n")) {
-            if (string.startsWith("$ cd /")) {
-                current = directory;
-            } else if (string.startsWith("$ cd ..")) {
-                current = current.parent;
-            } else if (string.startsWith("$ cd")) {
-                current = current.getChild(string.split(" ")[2]);
-            } else if (string.startsWith("dir")) {
-                Directory dir = new Directory(current, string.split(" ")[1]);
-                current.children.add(dir);
-                dirByName.put(current.name + dir.name, dir);
-            } else if (!string.startsWith("$ ls")) {
-                current.children.add(new File(current, Integer.parseInt(string.split(" ")[0]), string.split(" ")[1]));
-            }
-        }
-        long value = 0;
-        for (String string : dirByName.keySet()) {
-            long s = dirByName.get(string).size();
-            if (s < 100000) {
-                value = value + s;
-            }
-        }
-        return String.valueOf(value);
+        return String.valueOf(dir(input).allDirs().stream().mapToLong(Directory::size).filter(s -> s < 100000).sum());
     }
 
     @Override
     public String part2(String input) {
+        Directory root = dir(input);
+        return String.valueOf(root.allDirs().stream().filter(d -> d != root).mapToLong(Directory::size)
+                .filter(s -> s > root.size() - 40000000).min().orElse(root.size()));
+    }
+
+    private static Directory dir(String input) {
         Directory directory = new Directory(null, null);
         Directory current = directory;
-        List<Directory> dirByName = new ArrayList<>();
-        for (String string : input.split("\n")) {
-            if (string.startsWith("$ cd /")) {
-                current = directory;
-            } else if (string.startsWith("$ cd ..")) {
-                current = current.parent;
-            } else if (string.startsWith("$ cd")) {
-                current = current.getChild(string.split(" ")[2]);
-            } else if (string.startsWith("dir")) {
-                Directory dir = new Directory(current, string.split(" ")[1]);
-                current.children.add(dir);
-                dirByName.add(dir);
-            } else if (!string.startsWith("$ ls")) {
-                current.children.add(new File(current, Integer.parseInt(string.split(" ")[0]), string.split(" ")[1]));
+        for (String string : input.split(REGEX_NEW_LINE)) {
+            String[] split = string.split(" ");
+            switch (split[0]) {
+                case "$" -> {
+                    if ("cd".equals(split[1])) {
+                        switch (split[2]) {
+                            case "/" -> current = directory;
+                            case ".." -> current = current.parent;
+                            default -> current = current.getChild(split[2]);
+                        }
+                    }
+                }
+                case "dir" -> current.children.add(new Directory(current, split[1]));
+                default -> current.children.add(new File(current, Integer.parseInt(split[0]), split[1]));
             }
         }
-        long delete = directory.size();
-        long maxFull = directory.size() - 40000000;
-        for (Directory dir : dirByName) {
-            long s = dir.size();
-            if (s > maxFull && s < delete) {
-                delete = s;
-            }
-        }
-        return String.valueOf(delete);
+        return directory;
     }
 
     abstract static class Entry {
+        final Directory parent;
+        final String name;
+
         public Entry(Directory parent, String name) {
             this.parent = parent;
             this.name = name;
         }
 
-        final Directory parent;
-        final String name;
-
         abstract long size();
     }
 
     static class File extends Entry {
+        int size;
+
         File(Directory parent, int size, String name) {
             super(parent, name);
             this.size = size;
         }
-
-        int size;
 
         @Override
         long size() {
@@ -104,20 +75,16 @@ public class Day07 implements Puzzle {
 
         @Override
         long size() {
-            long size = 0;
-            for (Entry child : children) {
-                size = size + child.size();
-            }
-            return size;
+            return children.stream().mapToLong(Entry::size).sum();
+        }
+
+        List<Directory> allDirs() {
+            return Stream.concat(Stream.of(this), children.stream().filter(c -> c instanceof Directory)
+                    .flatMap(c -> ((Directory) c).allDirs().stream())).toList();
         }
 
         Directory getChild(String name) {
-            for (Entry child : children) {
-                if (Objects.equals(child.name, name)) {
-                    return (Directory) child;
-                }
-            }
-            throw new IllegalStateException();
+            return (Directory) children.stream().filter(c -> c.name.equals(name)).findAny().orElseThrow();
         }
     }
 }
