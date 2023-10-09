@@ -21,7 +21,7 @@ public class Day07 implements Puzzle {
     private static Directory dir(String input) {
         Directory directory = new Directory(null, null);
         Directory current = directory;
-        for (String string : input.split("\n")) {
+        for (String string : input.split(REGEX_NEW_LINE)) {
             String[] split = string.split(" ");
             switch (split[0]) {
                 case "$" -> {
