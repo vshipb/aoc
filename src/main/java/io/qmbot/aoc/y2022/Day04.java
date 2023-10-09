@@ -23,13 +23,10 @@ public class Day04 implements Puzzle {
     }
 
     static boolean fullyContains(int firstStart, int firstEnd, int secondStart, int secondEnd) {
-        return ((firstStart <= secondStart) && (firstEnd >= secondEnd))
-                || ((firstStart >= secondStart) && (firstEnd <= secondEnd));
+        return ((firstStart <= secondStart) && (firstEnd >= secondEnd)) || ((firstStart >= secondStart) && (firstEnd <= secondEnd));
     }
 
     static boolean overlapAtAll(int firstStart, int firstEnd, int secondStart, int secondEnd) {
-        return ((firstStart <= secondStart) && (firstEnd >= secondStart))
-                || ((firstEnd >= secondEnd) && (firstStart <= secondEnd))
-                || fullyContains(firstStart, secondStart, firstEnd, secondEnd);
+        return (firstEnd >= secondStart && firstStart <= secondStart) || (secondEnd >= firstStart && secondStart <= firstStart);
     }
 }
