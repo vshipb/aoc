@@ -1,51 +1,22 @@
 package io.qmbot.aoc.y2022;
 
 import io.qmbot.aoc.Puzzle;
+import java.util.stream.IntStream;
 
 public class Day09 implements Puzzle {
 
     @Override
     public String part1(String input) {
-        Field field = new Field(2);
-        for (String string : input.split("\n")) {
-            String[] command = string.split(" ");
-            String move = command[0];
-            int steps = Integer.parseInt(command[1]);
-            for (int i = 0; i < steps; i++) {
-                field.move(move);
-            }
-        }
-        int an = 0;
-        for (int i = 0; i < 1000; i++) {
-            for (int j = 0; j < 1000; j++) {
-                if (field.grid[i][j]) {
-                    an++;
-                }
-            }
-        }
-        return Integer.toString(an);
+        return Integer.toString(positions(new Field(2, input)));
     }
 
     @Override
     public String part2(String input) {
-        Field field = new Field(10);
-        for (String string : input.split("\n")) {
-            String[] command = string.split(" ");
-            String move = command[0];
-            int steps = Integer.parseInt(command[1]);
-            for (int i = 0; i < steps; i++) {
-                field.move(move);
-            }
-        }
-        int an = 0;
-        for (int i = 0; i < 1000; i++) {
-            for (int j = 0; j < 1000; j++) {
-                if (field.grid[i][j]) {
-                    an++;
-                }
-            }
-        }
-        return Integer.toString(an);
+        return Integer.toString(positions(new Field(10, input)));
+    }
+
+    private static int positions(Field field) {
+        return Math.toIntExact(IntStream.range(0, 1000).flatMap(i -> IntStream.range(0, 1000).filter(j -> field.grid[i][j])).count());
     }
 
     static class Field {
@@ -54,7 +25,7 @@ public class Day09 implements Puzzle {
         static int[] y;
         int knots;
 
-        Field(int knots) {
+        Field(int knots, String input) {
             this.knots = knots;
             x = new int[knots];
             y = new int[knots];
@@ -62,6 +33,17 @@ public class Day09 implements Puzzle {
                 x[i] = 500;
                 y[i] = 500;
             }
+            this.moving(input);
+        }
+
+        private Field moving(String input) {
+            for (String string : input.split(REGEX_NEW_LINE)) {
+                String[] command = string.split(" ");
+                for (int i = 0; i < Integer.parseInt(command[1]); i++) {
+                    this.move(command[0]);
+                }
+            }
+            return this;
         }
 
         void move(String command) {
@@ -70,7 +52,7 @@ public class Day09 implements Puzzle {
                 case "L" -> x[0]--;
                 case "U" -> y[0]--;
                 case "D" -> y[0]++;
-                default -> System.out.println("недопустимое направление");
+                default -> throw new IllegalStateException("Illegal input");
             }
             moveTail();
             grid[y[knots - 1]][x[knots - 1]] = true;
@@ -81,10 +63,8 @@ public class Day09 implements Puzzle {
                 if (Math.abs(x[i - 1] - x[i]) <= 1 && Math.abs(y[i - 1] - y[i]) <= 1) {
                     continue;
                 }
-                int dx = Integer.compare(x[i - 1], x[i]);
-                int dy = Integer.compare(y[i - 1], y[i]);
-                x[i] = x[i] + dx;
-                y[i] = y[i] + dy;
+                x[i] = x[i] + Integer.compare(x[i - 1], x[i]);
+                y[i] = y[i] + Integer.compare(y[i - 1], y[i]);
             }
         }
     }
