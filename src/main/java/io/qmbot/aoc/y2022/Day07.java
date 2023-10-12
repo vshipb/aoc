@@ -1,6 +1,7 @@
 package io.qmbot.aoc.y2022;
 
 import io.qmbot.aoc.Puzzle;
+import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Stream;
@@ -19,8 +20,9 @@ public class Day07 implements Puzzle {
     }
 
     private static Directory dir(String input) {
-        Directory directory = new Directory(null, null);
+        Directory directory = new Directory(null);
         Directory current = directory;
+        ArrayDeque<Directory> stack = new ArrayDeque<>();
         for (String string : input.split(REGEX_NEW_LINE)) {
             String[] split = string.split(" ");
             switch (split[0]) {
@@ -28,24 +30,25 @@ public class Day07 implements Puzzle {
                     if ("cd".equals(split[1])) {
                         switch (split[2]) {
                             case "/" -> current = directory;
-                            case ".." -> current = current.parent;
-                            default -> current = current.getChild(split[2]);
+                            case ".." -> current = stack.pop();
+                            default -> {
+                                stack.push(current);
+                                current = current.getChild(split[2]);
+                            }
                         }
                     }
                 }
-                case "dir" -> current.children.add(new Directory(current, split[1]));
-                default -> current.children.add(new File(current, Integer.parseInt(split[0]), split[1]));
+                case "dir" -> current.children.add(new Directory(split[1]));
+                default -> current.children.add(new File(split[1], Integer.parseInt(split[0])));
             }
         }
         return directory;
     }
 
     abstract static class Entry {
-        final Directory parent;
         final String name;
 
-        public Entry(Directory parent, String name) {
-            this.parent = parent;
+        public Entry(String name) {
             this.name = name;
         }
 
@@ -55,8 +58,8 @@ public class Day07 implements Puzzle {
     static class File extends Entry {
         int size;
 
-        File(Directory parent, int size, String name) {
-            super(parent, name);
+        File(String name, int size) {
+            super(name);
             this.size = size;
         }
 
@@ -69,8 +72,8 @@ public class Day07 implements Puzzle {
     static class Directory extends Entry {
         List<Entry> children = new ArrayList<>();
 
-        Directory(Directory parent, String name) {
-            super(parent, name);
+        Directory(String name) {
+            super(name);
         }
 
         @Override
