@@ -5,17 +5,10 @@ import io.qmbot.aoc.Puzzle;
 public class Day08 implements Puzzle {
     @Override
     public String part1(String input) {
-        int size = input.split("\n").length;
-        int[][] forest = new int[size][size];
-        int y = 0;
-        for (String string : input.split("\n")) {
-            for (int x = 0; x < size; x++) {
-                forest[y][x] = Integer.parseInt(String.valueOf(string.charAt(x)));
-            }
-            y++;
-        }
+        int[][] forest = forest(input);
+        int size = forest.length;
         int visible = 0;
-        for (y = 0; y < size; y++) {
+        for (int y = 0; y < size; y++) {
             for (int x = 0; x < size; x++) {
                 if (isVisibleTop(forest, y, x)
                         || isVisibleBottom(forest, y, x, size)
@@ -30,17 +23,10 @@ public class Day08 implements Puzzle {
 
     @Override
     public String part2(String input) {
-        int size = input.split("\n").length;
-        int[][] forest = new int[size][size];
-        int y = 0;
-        for (String string : input.split("\n")) {
-            for (int x = 0; x < size; x++) {
-                forest[y][x] = Integer.parseInt(String.valueOf(string.charAt(x)));
-            }
-            y++;
-        }
+        int[][] forest = forest(input);
+        int size = forest.length;
         int bestPlace = 0;
-        for (y = 0; y < size; y++) {
+        for (int y = 0; y < size; y++) {
             for (int x = 0; x < size; x++) {
                 int top = treesVisibleTop(forest, y, x);
                 int bottom = treesVisibleBottom(forest, y, x, size);
@@ -53,6 +39,19 @@ public class Day08 implements Puzzle {
             }
         }
         return String.valueOf(bestPlace);
+    }
+
+    private static int[][] forest(String input) {
+        int size = input.split(REGEX_NEW_LINE).length;
+        int[][] forest = new int[size][size];
+        int y = 0;
+        for (String string : input.split(REGEX_NEW_LINE)) {
+            for (int x = 0; x < size; x++) {
+                forest[y][x] = Integer.parseInt(String.valueOf(string.charAt(x)));
+            }
+            y++;
+        }
+        return forest;
     }
 
     private static boolean isVisibleTop(int[][] forest, int y, int x) {
