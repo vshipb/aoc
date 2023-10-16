@@ -41,9 +41,6 @@ public class Day10 implements Puzzle {
     }
 
     private static int addX(int x, String cmd) {
-        if (!cmd.equals("noop") && !cmd.equals("addx")) {
-            return x + Integer.parseInt(cmd);
-        }
-        return x;
+        return cmd.equals("noop") || cmd.equals("addx") ? x : x + Integer.parseInt(cmd);
     }
 }
