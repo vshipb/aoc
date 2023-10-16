@@ -7,12 +7,12 @@ public class Day09 implements Puzzle {
 
     @Override
     public String part1(String input) {
-        return Integer.toString(positions(new Field(2, input)));
+        return Integer.toString(positions(new Field(2).move(input)));
     }
 
     @Override
     public String part2(String input) {
-        return Integer.toString(positions(new Field(10, input)));
+        return Integer.toString(positions(new Field(10).move(input)));
     }
 
     private static int positions(Field field) {
@@ -25,7 +25,7 @@ public class Day09 implements Puzzle {
         static int[] y;
         int knots;
 
-        Field(int knots, String input) {
+        Field(int knots) {
             this.knots = knots;
             x = new int[knots];
             y = new int[knots];
@@ -33,32 +33,31 @@ public class Day09 implements Puzzle {
                 x[i] = 500;
                 y[i] = 500;
             }
-            this.moving(input);
         }
 
-        private Field moving(String input) {
+        private Field move(String input) {
             for (String string : input.split(REGEX_NEW_LINE)) {
                 String[] command = string.split(" ");
                 for (int i = 0; i < Integer.parseInt(command[1]); i++) {
-                    this.move(command[0]);
+                    this.step(command[0]);
                 }
             }
             return this;
         }
 
-        void move(String command) {
+        private void step(String command) {
             switch (command) {
                 case "R" -> x[0]++;
                 case "L" -> x[0]--;
                 case "U" -> y[0]--;
                 case "D" -> y[0]++;
-                default -> throw new IllegalStateException("Illegal input");
+                default -> throw new IllegalArgumentException();
             }
             moveTail();
             grid[y[knots - 1]][x[knots - 1]] = true;
         }
 
-        void moveTail() {
+        private void moveTail() {
             for (int i = 1; i < knots; i++) {
                 if (Math.abs(x[i - 1] - x[i]) <= 1 && Math.abs(y[i - 1] - y[i]) <= 1) {
                     continue;
