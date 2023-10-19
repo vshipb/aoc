@@ -4,7 +4,7 @@ import io.qmbot.aoc.Puzzle;
 import java.util.stream.IntStream;
 
 public class Day09 implements Puzzle {
-    private final static int SIZE = 1000;
+    private static final int SIZE = 1000;
 
     @Override
     public String part1(String input) {
@@ -31,9 +31,10 @@ public class Day09 implements Puzzle {
                 y[i] = SIZE / 2;
             }
         }
+
         private int positions() {
-            return Math.toIntExact(IntStream.range(0, SIZE).
-                    flatMap(i -> IntStream.range(0, SIZE).filter(j -> grid[i][j])).count());
+            return Math.toIntExact(IntStream.range(0, SIZE)
+                            .flatMap(i -> IntStream.range(0, SIZE).filter(j -> grid[i][j])).count());
         }
 
         private Field move(String input) {
