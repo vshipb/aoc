@@ -52,7 +52,7 @@ public class Day10 implements Puzzle {
     private static String recognize(String string) {
         String[] lines = string.split(REGEX_NEW_LINE);
         StringBuilder result = new StringBuilder();
-        for(int x = 0; x < lines[0].length() - 1; x += 5){
+        for (int x = 0; x < lines[0].length() - 1; x += 5) {
             int finalX = x;
             result.append(recognizeChar(Arrays.stream(lines)
                     .map(line -> line.substring(finalX, finalX + 4) + REGEX_NEW_LINE).collect(Collectors.joining())));
@@ -60,8 +60,8 @@ public class Day10 implements Puzzle {
         return result.toString();
     }
 
-    private static char recognizeChar(String string){
-        return switch (string){
+    private static char recognizeChar(String string) {
+        return switch (string) {
             case """
                     ###.
                     #..#
@@ -69,7 +69,7 @@ public class Day10 implements Puzzle {
                     ###.
                     #.#.
                     #..#
-                    """ ->  'R';
+                    """ -> 'R';
             case """
                     ####
                     ...#
@@ -117,7 +117,7 @@ public class Day10 implements Puzzle {
                     ####
                     #..#
                     #..#
-                    """ ->'A';
+                    """ -> 'A';
             default -> throw new IllegalArgumentException("Unknown char:\n" + string);
         };
     }
