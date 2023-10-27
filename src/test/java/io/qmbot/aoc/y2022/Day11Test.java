@@ -7,33 +7,34 @@ import org.junit.jupiter.api.Test;
 public class Day11Test {
     Puzzle p = new Day11();
 
-    String input = "Monkey 0:\n" +
-            "  Starting items: 79, 98\n" +
-            "  Operation: new = old * 19\n" +
-            "  Test: divisible by 23\n" +
-            "    If true: throw to monkey 2\n" +
-            "    If false: throw to monkey 3\n" +
-            "\n" +
-            "Monkey 1:\n" +
-            "  Starting items: 54, 65, 75, 74\n" +
-            "  Operation: new = old + 6\n" +
-            "  Test: divisible by 19\n" +
-            "    If true: throw to monkey 2\n" +
-            "    If false: throw to monkey 0\n" +
-            "\n" +
-            "Monkey 2:\n" +
-            "  Starting items: 79, 60, 97\n" +
-            "  Operation: new = old * old\n" +
-            "  Test: divisible by 13\n" +
-            "    If true: throw to monkey 1\n" +
-            "    If false: throw to monkey 3\n" +
-            "\n" +
-            "Monkey 3:\n" +
-            "  Starting items: 74\n" +
-            "  Operation: new = old + 3\n" +
-            "  Test: divisible by 17\n" +
-            "    If true: throw to monkey 0\n" +
-            "    If false: throw to monkey 1";
+    String input = """
+            Monkey 0:
+              Starting items: 79, 98
+              Operation: new = old * 19
+              Test: divisible by 23
+                If true: throw to monkey 2
+                If false: throw to monkey 3
+
+            Monkey 1:
+              Starting items: 54, 65, 75, 74
+              Operation: new = old + 6
+              Test: divisible by 19
+                If true: throw to monkey 2
+                If false: throw to monkey 0
+
+            Monkey 2:
+              Starting items: 79, 60, 97
+              Operation: new = old * old
+              Test: divisible by 13
+                If true: throw to monkey 1
+                If false: throw to monkey 3
+
+            Monkey 3:
+              Starting items: 74
+              Operation: new = old + 3
+              Test: divisible by 17
+                If true: throw to monkey 0
+                If false: throw to monkey 1""";
 
     @Test
     public void part1(){
