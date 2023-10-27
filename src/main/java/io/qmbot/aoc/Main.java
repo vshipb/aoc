@@ -15,7 +15,7 @@ public class Main {
         final String name = args[1];
         final int year = Integer.parseInt(args[2]);
         if (args.length < 4) {
-            for (int i = 1; i < 26; i++){
+            for (int i = 1; i < 26; i++) {
                 doDay(i, year, name, cookie);
             }
         } else {
