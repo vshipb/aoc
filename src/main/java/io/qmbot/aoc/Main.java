@@ -2,12 +2,14 @@ package io.qmbot.aoc;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.HttpURLConnection;
+import java.net.URI;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Objects;
-import okhttp3.OkHttpClient;
-import okhttp3.Request;
-import okhttp3.Response;
 
 public class Main {
     public static void main(String[] args) throws Exception {
@@ -36,12 +38,12 @@ public class Main {
 
     }
 
-    private static void writeFile(int day, int year, String name, String cookie) throws IOException {
+    private static void writeFile(int day, int year, String name, String cookie) throws IOException, InterruptedException {
         String url = String.format("https://adventofcode.com/%d/day/%d/input", year, day);
-        Request request = new Request.Builder().url(url).addHeader("Cookie", cookie).build();
-        OkHttpClient client = new OkHttpClient().newBuilder().build();
-        Response response = client.newCall(request).execute();
-        if (!response.isSuccessful()) {
+        HttpRequest request = HttpRequest.newBuilder().uri(URI.create(url)).header("Cookie", cookie).build();
+        HttpClient client = HttpClient.newHttpClient();
+        HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+        if (response.statusCode() != HttpURLConnection.HTTP_OK) {
             throw new IllegalArgumentException(String.valueOf(response));
         }
         String folder = String.format("src/main/resources/%s/%d", name, year);
@@ -49,6 +51,6 @@ public class Main {
         if (!file.exists()) {
             file.mkdirs();
         }
-        Files.write(Path.of(folder, day + ".txt"), Objects.requireNonNull(response.body()).string().getBytes());
+        Files.write(Path.of(folder, day + ".txt"), Objects.requireNonNull(response.body()).getBytes());
     }
 }
