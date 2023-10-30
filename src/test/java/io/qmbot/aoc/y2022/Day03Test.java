@@ -7,12 +7,13 @@ import org.junit.jupiter.api.Test;
 public class Day03Test {
     Puzzle p = new Day03();
 
-    String input = "vJrwpWtwJgWrhcsFMMfFFhFp\n" +
-            "jqHRNqRjqzjGDLGLrsFMfFZSrLrFZsSL\n" +
-            "PmmdzqPrVvPwwTWBwg\n" +
-            "wMqvLMZHhHMvwLHjbvcjnnSBnvTQFn\n" +
-            "ttgJtRGJQctTZtZT\n" +
-            "CrZsJsPPZsGzwwsLwLmpwMDw";
+    String input = """
+            vJrwpWtwJgWrhcsFMMfFFhFp
+            jqHRNqRjqzjGDLGLrsFMfFZSrLrFZsSL
+            PmmdzqPrVvPwwTWBwg
+            wMqvLMZHhHMvwLHjbvcjnnSBnvTQFn
+            ttgJtRGJQctTZtZT
+            CrZsJsPPZsGzwwsLwLmpwMDw""";
 
     @Test
     public void part1(){

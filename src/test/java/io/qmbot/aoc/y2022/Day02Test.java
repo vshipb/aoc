@@ -8,9 +8,10 @@ import org.junit.jupiter.api.Test;
 public class Day02Test {
     Puzzle p = new Day02();
 
-    String input = "A Y\n" +
-            "B X\n" +
-            "C Z";
+    String input = """
+            A Y
+            B X
+            C Z""";
 
     @Test
     public void part1() {

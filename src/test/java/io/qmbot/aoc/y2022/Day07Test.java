@@ -7,29 +7,30 @@ import org.junit.jupiter.api.Test;
 public class Day07Test {
     Puzzle p = new Day07();
 
-    String input = "$ cd /\n" +
-            "$ ls\n" +
-            "dir a\n" +
-            "14848514 b.txt\n" +
-            "8504156 c.dat\n" +
-            "dir d\n" +
-            "$ cd a\n" +
-            "$ ls\n" +
-            "dir e\n" +
-            "29116 f\n" +
-            "2557 g\n" +
-            "62596 h.lst\n" +
-            "$ cd e\n" +
-            "$ ls\n" +
-            "584 i\n" +
-            "$ cd ..\n" +
-            "$ cd ..\n" +
-            "$ cd d\n" +
-            "$ ls\n" +
-            "4060174 j\n" +
-            "8033020 d.log\n" +
-            "5626152 d.ext\n" +
-            "7214296 k";
+    String input = """
+            $ cd /
+            $ ls
+            dir a
+            14848514 b.txt
+            8504156 c.dat
+            dir d
+            $ cd a
+            $ ls
+            dir e
+            29116 f
+            2557 g
+            62596 h.lst
+            $ cd e
+            $ ls
+            584 i
+            $ cd ..
+            $ cd ..
+            $ cd d
+            $ ls
+            4060174 j
+            8033020 d.log
+            5626152 d.ext
+            7214296 k""";
 
     @Test
     public void test1() {
