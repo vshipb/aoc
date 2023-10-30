@@ -4,35 +4,37 @@ import io.qmbot.aoc.Puzzle;
 import java.util.stream.IntStream;
 
 public class Day09 implements Puzzle {
+    private static final int SIZE = 1000;
 
     @Override
     public String part1(String input) {
-        return Integer.toString(positions(new Field(2).move(input)));
+        return Integer.toString(new Field(2).move(input).position());
     }
 
     @Override
     public String part2(String input) {
-        return Integer.toString(positions(new Field(10).move(input)));
-    }
-
-    private static int positions(Field field) {
-        return Math.toIntExact(IntStream.range(0, 1000).flatMap(i -> IntStream.range(0, 1000).filter(j -> field.grid[i][j])).count());
+        return Integer.toString(new Field(10).move(input).positions());
     }
 
     static class Field {
-        boolean[][] grid = new boolean[1000][1000];
-        static int[] x;
-        static int[] y;
-        int knots;
+        private final boolean[][] grid = new boolean[SIZE][SIZE];
+        private static int[] x;
+        private static int[] y;
+        private final int knots;
 
         Field(int knots) {
             this.knots = knots;
             x = new int[knots];
             y = new int[knots];
             for (int i = 0; i < knots; i++) {
-                x[i] = 500;
-                y[i] = 500;
+                x[i] = SIZE / 2;
+                y[i] = SIZE / 2;
             }
+        }
+
+        private int positions() {
+            return Math.toIntExact(IntStream.range(0, SIZE)
+                            .flatMap(i -> IntStream.range(0, SIZE).filter(j -> grid[i][j])).count());
         }
 
         private Field move(String input) {

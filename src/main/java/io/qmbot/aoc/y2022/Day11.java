@@ -2,143 +2,92 @@ package io.qmbot.aoc.y2022;
 
 import io.qmbot.aoc.Puzzle;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
+import java.util.function.LongBinaryOperator;
 
 public class Day11 implements Puzzle {
     @Override
     public String part1(String input) {
-        List<String> strings = List.of(input.split("\n"));
-        List<Monkey> monkeys = new ArrayList<>();
-        for (int i = 0; i < strings.size(); i = i + 7) {
-            List<String> monkey = new ArrayList<>();
-            for (int j = 0; j < 6; j++) {
-                monkey.add(strings.get(i + j));
-            }
-            monkeys.add(parse(monkey));
-        }
-        for (int i = 0; i < 20; i++) {
-            for (Monkey monkey : monkeys) {
-                monkey.turn(monkeys);
-            }
-        }
-        long[] business = new long[monkeys.size()];
-        for (int i = 0; i < monkeys.size(); i++) {
-            business[i] = monkeys.get(i).times;
-        }
-        Arrays.sort(business);
-        return Long.toString(business[monkeys.size() - 1] * business[monkeys.size() - 2]);
+        List<Monkey> monkeys = monkeys(input);
+        turns(monkeys, 3, 20);
+        return String.valueOf(business(monkeys));
     }
 
     @Override
     public String part2(String input) {
-        List<String> strings = List.of(input.split("\n"));
-        List<Monkey> monkeys = new ArrayList<>();
-        for (int i = 0; i < strings.size(); i = i + 7) {
-            List<String> monkey = new ArrayList<>();
-            for (int j = 0; j < 6; j++) {
-                monkey.add(strings.get(i + j));
-            }
-            monkeys.add(parse(monkey));
-        }
-        long devisible = 1;
-        for (Monkey monkey : monkeys) {
-            devisible = devisible * monkey.divisible;
-        }
-        for (int i = 0; i < 10000; i++) {
-            for (Monkey monkey : monkeys) {
-                monkey.turn2(monkeys, devisible);
-            }
-        }
-        long[] bussines = new long[monkeys.size()];
-        for (int i = 0; i < monkeys.size(); i++) {
-            bussines[i] = monkeys.get(i).times;
-        }
-
-        Arrays.sort(bussines);
-        return Long.toString(bussines[monkeys.size() - 1] * bussines[monkeys.size() - 2]);
+        List<Monkey> monkeys = monkeys(input);
+        int divisor = monkeys.stream().mapToInt(monkey -> monkey.divisibleBy).reduce(1, Math::multiplyExact);
+        turns(monkeys, divisor, 10000);
+        return String.valueOf(business(monkeys));
     }
 
-    static Monkey parse(List<String> monkey) {
-        Monkey result = new Monkey();
-        for (String s : monkey) {
-            String[] word = s.split(" ");
-            if (word.length > 2) {
-                if (word[2].equals("Starting")) {
-                    for (int j = 4; j < s.split(" ").length; j++) {
-                        result.items.add(Long.valueOf(word[j].replaceAll(",", "")));
-                    }
-                }
-                if (word[2].equals("Operation:")) {
-                    result.operation = word[6];
-                    result.change = word[7];
-                }
-                if (word[2].equals("Test:")) {
-                    result.divisible = Long.valueOf(word[5]);
-                }
-                if (word.length > 5 && word[5].equals("true:")) {
-                    result.ifTrue = Integer.parseInt(word[9]);
-                }
-                if (word.length > 5 && word[5].equals("false:")) {
-                    result.ifFalse = Integer.parseInt(word[9]);
-                }
-                result.times = 0;
+    static long business(List<Monkey> monkeys) {
+        long[] business = monkeys.stream().mapToLong(monkey -> monkey.inspectedItemsCount).sorted().toArray();
+        int size = monkeys.size();
+        return business[size - 1] * business[size - 2];
+    }
+
+    void turns(List<Monkey> monkeys, int divisible, int rounds) {
+        for (int i = 0; i < rounds; i++) {
+            for (Monkey monkey : monkeys) {
+                monkey.turn(monkeys, divisible);
             }
         }
-        return result;
+    }
+
+    static List<Monkey> monkeys(String input) {
+        List<String> strings = List.of(input.split(REGEX_NEW_LINE));
+        List<Monkey> monkeys = new ArrayList<>();
+        for (int i = 0; i < strings.size(); i = i + 7) {
+            List<String> blueprint = strings.subList(i, i + 6);
+            monkeys.add(new Monkey(blueprint));
+        }
+        return monkeys;
     }
 
     private static class Monkey {
-        List<Long> items = new ArrayList<>();
-        String operation;
-        String change;
-        Long divisible;
-        int ifTrue;
-        int ifFalse;
-        long times;
+        final List<Long> items = new ArrayList<>();
+        final LongBinaryOperator operator;
+        final Integer secondOperand;
+        final int divisibleBy;
+        final int ifTrue;
+        final int ifFalse;
+        int inspectedItemsCount;
 
-        private long operation(long value) {
-            times++;
-            long newWorry = 0;
-            if (change.equals("old")) {
-                return value * value;
+        public Monkey(List<String> blueprint) {
+            for (int j = 4; j < blueprint.get(1).split(" ").length; j++) {
+                this.items.add(Long.valueOf(blueprint.get(1).split(" ")[j].replaceAll(",", "")));
             }
-            switch (operation) {
-                case "*" -> newWorry = value * Integer.parseInt(change);
-                case "+" -> newWorry = value + Integer.parseInt(change);
-                default -> System.out.println("Недопустимая динамика");
-            }
-            return newWorry;
+
+            this.operator = blueprint.get(2).split(" ")[6].charAt(0) == '*' ? Math::multiplyExact : Math::addExact;
+            String secondOperand = blueprint.get(2).split(" ")[7];
+            this.secondOperand = (secondOperand.equals("old")) ? null : Integer.parseInt(secondOperand);
+            this.divisibleBy = Integer.parseInt(blueprint.get(3).split(" ")[5]);
+            this.ifTrue = Integer.parseInt(blueprint.get(4).split(" ")[9]);
+            this.ifFalse = Integer.parseInt(blueprint.get(5).split(" ")[9]);
+            this.inspectedItemsCount = 0;
+        }
+
+        private long operation(long firstOperand) {
+            inspectedItemsCount++;
+            return operator.applyAsLong(firstOperand, secondOperand != null ? secondOperand : firstOperand);
         }
 
         private boolean test(long value) {
-            return value % divisible == 0;
+            return value % divisibleBy == 0;
         }
 
-        void turn(List<Monkey> monkeys) {
-            for (long item : items) {
-                long newValue = operation(item);
-                newValue = newValue / 3;
-                if (test(newValue)) {
-                    monkeys.get(ifTrue).items.add(newValue);
-                } else {
-                    monkeys.get(ifFalse).items.add(newValue);
-                }
-            }
-            items.removeAll(items);
+        void turn(List<Monkey> monkeys, int divisor) {
+            items.forEach(item -> {
+                long newValue = newValue(divisor, operation(item));
+                monkeys.get(test(newValue) ? ifTrue : ifFalse).items.add(newValue);
+            });
+            items.clear();
         }
 
-        void turn2(List<Monkey> monkeys, long divisible) {
-            for (long item : items) {
-                long newValue = operation(item);
-                newValue = newValue % divisible;
-                if (test(newValue)) {
-                    monkeys.get(ifTrue).items.add(newValue);
-                } else {
-                    monkeys.get(ifFalse).items.add(newValue);
-                }
-            }
-            items.removeAll(items);
+        long newValue(int divisor, long newValue) {
+            return (divisor == 3) ? newValue / 3 : newValue % divisor;
         }
     }
 }
+
