@@ -8,7 +8,7 @@ public class Day09 implements Puzzle {
 
     @Override
     public String part1(String input) {
-        return Integer.toString(new Field(2).move(input).position());
+        return Integer.toString(new Field(2).move(input).positions());
     }
 
     @Override
