@@ -6,14 +6,14 @@ import java.util.Arrays;
 public class Day01 implements Puzzle {
     @Override
     public String part1(String input) {
-        return Long.toString(Arrays.stream(input.split("\n\n"))
+        return Long.toString(Arrays.stream(input.split(REGEX_NEW_LINE + REGEX_NEW_LINE))
                 .mapToLong(s -> s.lines().mapToLong(Long::parseLong).sum())
                 .max().orElseThrow());
     }
 
     @Override
     public String part2(String input) {
-        long[] sort = Arrays.stream(input.split("\n\n"))
+        long[] sort = Arrays.stream(input.split(REGEX_NEW_LINE + REGEX_NEW_LINE))
                 .mapToLong(s -> s.lines().mapToLong(Long::parseLong).sum())
                 .sorted().toArray();
         int length = sort.length;
