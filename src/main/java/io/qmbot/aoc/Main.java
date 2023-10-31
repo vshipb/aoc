@@ -12,7 +12,7 @@ import java.util.Objects;
 
 public class Main {
 
-  public static void main(String[] args) throws Exception {
+    public static void main(String[] args) throws Exception {
         String dir = args[0];
         int year = Integer.parseInt(args[1]);
         String cookie = args[2];
