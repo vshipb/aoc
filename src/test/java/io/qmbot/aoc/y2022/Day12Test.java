@@ -7,11 +7,12 @@ import org.junit.jupiter.api.Test;
 public class Day12Test {
     Puzzle p = new Day12();
 
-    String input = "Sabqponm\n" +
-            "abcryxxl\n" +
-            "accszExk\n" +
-            "acctuvwj\n" +
-            "abdefghi";
+    String input = """
+            Sabqponm
+            abcryxxl
+            accszExk
+            acctuvwj
+            abdefghi""";
 
     @Test
     public void part1(){

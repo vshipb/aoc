@@ -7,19 +7,20 @@ import org.junit.jupiter.api.Test;
 public class Day18Test {
     Puzzle p = new Day18();
 
-    String input = "2,2,2\n" +
-            "1,2,2\n" +
-            "3,2,2\n" +
-            "2,1,2\n" +
-            "2,3,2\n" +
-            "2,2,1\n" +
-            "2,2,3\n" +
-            "2,2,4\n" +
-            "2,2,6\n" +
-            "1,2,5\n" +
-            "3,2,5\n" +
-            "2,1,5\n" +
-            "2,3,5";
+    String input = """
+            2,2,2
+            1,2,2
+            3,2,2
+            2,1,2
+            2,3,2
+            2,2,1
+            2,2,3
+            2,2,4
+            2,2,6
+            1,2,5
+            3,2,5
+            2,1,5
+            2,3,5""";
 
     @Test
     public void part1(){

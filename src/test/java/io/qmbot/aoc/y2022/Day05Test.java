@@ -7,15 +7,16 @@ import org.junit.jupiter.api.Test;
 public class Day05Test {
     Puzzle p = new Day05();
 
-    String input = "    [D]    \n" +
-            "[N] [C]    \n" +
-            "[Z] [M] [P]\n" +
-            " 1   2   3 \n" +
-            "\n" +
-            "move 1 from 2 to 1\n" +
-            "move 3 from 1 to 3\n" +
-            "move 2 from 2 to 1\n" +
-            "move 1 from 1 to 2";
+    String input = """
+                [D]
+            [N] [C]
+            [Z] [M] [P]
+             1   2   3
+
+            move 1 from 2 to 1
+            move 3 from 1 to 3
+            move 2 from 2 to 1
+            move 1 from 1 to 2""";
 
     @Test
     public void test1() {

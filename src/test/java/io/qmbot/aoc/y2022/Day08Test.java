@@ -7,11 +7,12 @@ import org.junit.jupiter.api.Test;
 public class Day08Test {
     Puzzle p = new Day08();
 
-    String input = "30373\n" +
-            "25512\n" +
-            "65332\n" +
-            "33549\n" +
-            "35390";
+    String input = """
+            30373
+            25512
+            65332
+            33549
+            35390""";
 
     @Test
     public void part1(){
