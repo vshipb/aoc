@@ -11,15 +11,15 @@ import java.util.stream.Collectors;
 
 public class Day19 implements Puzzle {
     @Override
-    public String part1(String input) {
-        return String.valueOf(Arrays.stream(input.split(REGEX_NEW_LINE)).map(Blueprint::new)
-                .mapToInt(blueprint -> star(blueprint, 24) * blueprint.id).sum());
+    public Integer part1(String input) {
+        return Arrays.stream(input.split(REGEX_NEW_LINE)).map(Blueprint::new)
+                .mapToInt(blueprint -> star(blueprint, 24) * blueprint.id).sum();
     }
 
     @Override
-    public String part2(String input) {
-        return String.valueOf(Arrays.stream(input.split(REGEX_NEW_LINE)).limit(3).map(Blueprint::new)
-                .mapToInt(b -> star(b, 32)).reduce((a, b) -> a * b).orElseThrow());
+    public Integer part2(String input) {
+        return Arrays.stream(input.split(REGEX_NEW_LINE)).limit(3).map(Blueprint::new)
+                .mapToInt(b -> star(b, 32)).reduce((a, b) -> a * b).orElseThrow();
     }
 
     static class Blueprint {

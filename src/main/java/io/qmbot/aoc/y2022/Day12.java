@@ -6,7 +6,7 @@ import java.util.List;
 
 public class Day12 implements Puzzle {
     @Override
-    public String part1(String input) {
+    public Integer part1(String input) {
         List<String> strings = List.of(input.split("\n"));
         char[][] field = new char[strings.size()][strings.get(0).length()];
         int[][] field1 = new int[strings.size()][strings.get(0).length()];
@@ -37,11 +37,11 @@ public class Day12 implements Puzzle {
             points = newPointsCheck(field, field1, points);
             neighborCounts = points.size();
         }
-        return Integer.toString(field1[endY][endX]);
+        return field1[endY][endX];
     }
 
     @Override
-    public String part2(String input) {
+    public Integer part2(String input) {
         List<String> strings = List.of(input.split("\n"));
         int stringSize = strings.size();
         int stringSize1 = strings.get(0).length();
@@ -67,7 +67,7 @@ public class Day12 implements Puzzle {
         while (field[points.get(0).y][points.get(0).x] != 'a') {
             points = newPointsCheck1(field, field1, points);
         }
-        return Integer.toString(field1[points.get(0).y][points.get(0).x]);
+        return field1[points.get(0).y][points.get(0).x];
     }
 
     record Point(int x, int y) {

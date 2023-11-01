@@ -9,22 +9,21 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 public class Day17 implements Puzzle {
     @Override
-    public String part1(String input) {
+    public Integer part1(String input) {
         Field field = new Field(input, 8000, 2022);
         field.falling(field.figuresCount);
-        int high = field.added.intValue() - (newStartY(field.field) + 4);
-        return String.valueOf(high);
+        return field.added.intValue() - (newStartY(field.field) + 4);
     }
 
     @Override
-    public String part2(String input) {
+    public Long part2(String input) {
         Field f = new Field(input, 100, 10000);
         f.falling(f.figuresCount);
         long iFirst = f.figuresBeforeCycle;
         Field field = new Field(input, 100, 1_000_000_000_000L);
         field.countCycles(iFirst, f.figuresPerCycle);
         field.falling(field.figuresLeftAfterCycles + iFirst);
-        return String.valueOf(field.findHigh(f.linesPerCycle));
+        return field.findHigh(f.linesPerCycle);
     }
 
     static class Field {

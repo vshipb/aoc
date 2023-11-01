@@ -7,18 +7,18 @@ import java.util.function.LongBinaryOperator;
 
 public class Day11 implements Puzzle {
     @Override
-    public String part1(String input) {
+    public Long part1(String input) {
         List<Monkey> monkeys = monkeys(input);
         turns(monkeys, 3, 20);
-        return String.valueOf(business(monkeys));
+        return business(monkeys);
     }
 
     @Override
-    public String part2(String input) {
+    public Long part2(String input) {
         List<Monkey> monkeys = monkeys(input);
         int divisor = monkeys.stream().mapToInt(monkey -> monkey.divisibleBy).reduce(1, Math::multiplyExact);
         turns(monkeys, divisor, 10000);
-        return String.valueOf(business(monkeys));
+        return business(monkeys);
     }
 
     static long business(List<Monkey> monkeys) {

@@ -38,11 +38,11 @@ public class Day11Test {
 
     @Test
     public void part1(){
-        Assertions.assertEquals("10605", p.part1(input));
+        Assertions.assertEquals(10605L, p.part1(input));
     }
 
     @Test
     public void part2(){
-        Assertions.assertEquals("2713310158", p.part2(input));
+        Assertions.assertEquals(2713310158L, p.part2(input));
     }
 }

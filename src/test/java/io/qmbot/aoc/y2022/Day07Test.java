@@ -8,7 +8,7 @@ public class Day07Test {
     Puzzle p = new Day07();
 
     String input = """
-            $ cd /
+            $ d /
             $ ls
             dir a
             14848514 b.txt
@@ -34,11 +34,11 @@ public class Day07Test {
 
     @Test
     public void test1() {
-        Assertions.assertEquals("95437", p.part1(input));
+        Assertions.assertEquals(95437, p.part1(input));
     }
 
     @Test
     public void test2() {
-        Assertions.assertEquals("24933642", p.part2(input));
+        Assertions.assertEquals(24933642, p.part2(input));
     }
 }

@@ -6,7 +6,7 @@ import java.util.List;
 
 public class Day14 implements Puzzle {
     @Override
-    public String part1(String input) {
+    public Integer part1(String input) {
         List<String> strings = List.of(input.split("\n"));
         int maxX = 0;
         int maxY = 0;
@@ -43,11 +43,11 @@ public class Day14 implements Puzzle {
                 }
             }
         }
-        return Integer.toString(countOfSend - 1);
+        return countOfSend - 1;
     }
 
     @Override
-    public String part2(String input) {
+    public Integer part2(String input) {
         List<String> strings = List.of(input.split("\n"));
         int maxY = 0;
         for (String string : strings) {
@@ -83,7 +83,7 @@ public class Day14 implements Puzzle {
             }
         }
 
-        return Integer.toString(countOfSend);
+        return countOfSend;
     }
 
     static class Rock {
