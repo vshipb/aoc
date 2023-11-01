@@ -7,8 +7,9 @@ import org.junit.jupiter.api.Test;
 public class Day14Test {
     Puzzle p = new Day14();
 
-    String input = "498,4 -> 498,6 -> 496,6\n" +
-            "503,4 -> 502,4 -> 502,9 -> 494,9";
+    String input = """
+            498,4 -> 498,6 -> 496,6
+            503,4 -> 502,4 -> 502,9 -> 494,9""";
 
     @Test
     public void part1(){

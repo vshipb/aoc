@@ -6,12 +6,13 @@ import org.junit.jupiter.api.Test;
 
 public class Day24Test {
     Puzzle p = new Day24();
-    String input = "#.######\n" +
-            "#>>.<^<#\n" +
-            "#.<..<<#\n" +
-            "#>v.><>#\n" +
-            "#<^v^^>#\n" +
-            "######.#";
+    String input = """
+            #.######
+            #>>.<^<#
+            #.<..<<#
+            #>v.><>#
+            #<^v^^>#
+            ######.#""";
 
     @Test
     public void part1() {

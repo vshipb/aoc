@@ -7,22 +7,24 @@ import org.junit.jupiter.api.Test;
 public class Day09Test {
     Puzzle p = new Day09();
 
-    String input = "R 4\n" +
-            "U 4\n" +
-            "L 3\n" +
-            "D 1\n" +
-            "R 4\n" +
-            "D 1\n" +
-            "L 5\n" +
-            "R 2";
-    String input2 = "R 5\n" +
-            "U 8\n" +
-            "L 8\n" +
-            "D 3\n" +
-            "R 17\n" +
-            "D 10\n" +
-            "L 25\n" +
-            "U 20";
+    String input = """
+            R 4
+            U 4
+            L 3
+            D 1
+            R 4
+            D 1
+            L 5
+            R 2""";
+    String input2 = """
+            R 5
+            U 8
+            L 8
+            D 3
+            R 17
+            D 10
+            L 25
+            U 20""";
 
     @Test
     public void part1(){

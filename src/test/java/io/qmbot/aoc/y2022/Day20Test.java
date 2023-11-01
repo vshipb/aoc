@@ -8,14 +8,15 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 public class Day20Test {
     Puzzle p = new Day20();
 
-    String input = "1\n" +
-            "2\n" +
-            "-3\n" +
-            "3\n" +
-            "-2\n" +
-            "0\n" +
-            "4";
-    String input2 = "1";
+    String input = """
+            1
+            2
+            -3
+            3
+            -2
+            0
+            4""";
+
     @Test
     public void testNewIndex() {
         assertEquals(newIndex(4, 5, 7), 3);

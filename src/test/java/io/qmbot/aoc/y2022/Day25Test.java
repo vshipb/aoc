@@ -6,19 +6,20 @@ import org.junit.jupiter.api.Test;
 
 public class Day25Test {
     Puzzle p = new Day25();
-    String input = "1=-0-2\n" +
-            "12111\n" +
-            "2=0=\n" +
-            "21\n" +
-            "2=01\n" +
-            "111\n" +
-            "20012\n" +
-            "112\n" +
-            "1=-1=\n" +
-            "1-12\n" +
-            "12\n" +
-            "1=\n" +
-            "122";
+    String input = """
+            1=-0-2
+            12111
+            2=0=
+            21
+            2=01
+            111
+            20012
+            112
+            1=-1=
+            1-12
+            12
+            1=
+            122""";
 
     @Test
     public void addTest() {
