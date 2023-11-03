@@ -25,7 +25,7 @@ public class Day15Test {
 
     @Test
     public void part1(){
-        Assertions.assertEquals(26, p.part1(input));
+        Assertions.assertEquals(26L, p.part1(input));
     }
 
     @Test

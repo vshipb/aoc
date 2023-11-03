@@ -7,7 +7,7 @@ import java.util.List;
 
 public class Day15 implements Puzzle {
     @Override
-    public Integer part1(String input) {
+    public String part1(String input) {
         List<String> strings = List.of(input.split("\n"));
         int sensorX;
         int sensorY;
@@ -41,11 +41,11 @@ public class Day15 implements Puzzle {
         for (int j : seekingField) {
             if (j == 1) freeSpace1++;
         }
-        return freeSpace1;
+        return String.valueOf(freeSpace1);
     }
 
     @Override
-    public Long part2(String input) {
+    public String part2(String input) {
         List<String> strings = List.of(input.split("\n"));
         int sensorX;
         int sensorY;
@@ -87,7 +87,8 @@ public class Day15 implements Puzzle {
                 pointB = fuse(pointB, point);
                 if (pointB.equals(falseField)) break;
                 if (pointB.equals(testing)) {
-                    return seekingX * 4000000L + j;
+                    long result = seekingX * 4000000L + j;
+                    return String.valueOf(result);
                 }
                 seekingX = pointB.partTwoX + 1;
             }
