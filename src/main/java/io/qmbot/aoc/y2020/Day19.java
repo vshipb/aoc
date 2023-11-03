@@ -2,9 +2,12 @@ package io.qmbot.aoc.y2020;
 
 import io.qmbot.aoc.Puzzle;
 
-import java.util.*;
-import java.util.stream.Collectors;
-
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.regex.*;
 public class Day19 implements Puzzle {
     @Override
     public String part1(String input) {
