@@ -112,9 +112,9 @@ public class Day22 implements Puzzle {
         int result = row * 1000 + column * 4 + facing;
         return result;
     }
-
+  
     @Override
-    public Integer part2(String input) {
+    public String part2(String input) {
         String[] splitInput = input.split("\n\n");
         String[] lines = splitInput[0].split("\n");
         String directions = splitInput[1];
@@ -288,7 +288,6 @@ public class Day22 implements Puzzle {
         int result = row * 1000 + column * 4 + facing;
         return result;
     }
-
 
     enum Direction {
         East(0, 1) {
