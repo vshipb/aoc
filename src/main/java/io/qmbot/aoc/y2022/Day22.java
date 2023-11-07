@@ -114,7 +114,7 @@ public class Day22 implements Puzzle {
     }
   
     @Override
-    public String part2(String input) {
+    public Integer part2(String input) {
         String[] splitInput = input.split("\n\n");
         String[] lines = splitInput[0].split("\n");
         String directions = splitInput[1];
