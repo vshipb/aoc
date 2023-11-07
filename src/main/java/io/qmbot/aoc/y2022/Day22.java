@@ -285,8 +285,7 @@ public class Day22 implements Puzzle {
         int column = (me.square.coordinateOnBoard.pointX * (size + 1)) + me.point.pointX + 1;
         int facing = me.direction.ordinal();
 
-        int result = row * 1000 + column * 4 + facing;
-        return result;
+        return row * 1000 + column * 4 + facing;
     }
 
     enum Direction {
