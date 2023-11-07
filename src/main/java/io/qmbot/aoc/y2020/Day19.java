@@ -8,22 +8,18 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.regex.*;
+
 public class Day19 implements Puzzle {
     @Override
     public String part1(String input) {
         String[] parts = input.split(REGEX_EMPTY_LINE);
         String[] rules = parts[0].split(REGEX_NEW_LINE);
         Map<Integer, Rule> allRules = new HashMap<>();
-
-        List<String> ready = new ArrayList<>();
-        ready.add("");
         Map<Integer, String> base = base(rules);
-        trueStrings(ready, 0, allRules, base);
-        ready.remove(ready.size() - 1);
+        String regex = regex(0, allRules, base);
         int result = 0;
-        String[] strings = parts[1].split(REGEX_NEW_LINE);
-        for (String string : strings) {
-            if (ready.contains(string)) {
+        for (String s : parts[1].split(REGEX_NEW_LINE)) {
+            if (Pattern.matches(regex, s)) {
                 result++;
             }
         }
@@ -34,60 +30,48 @@ public class Day19 implements Puzzle {
     public String part2(String input) {
         String[] parts = input.split(REGEX_EMPTY_LINE);
         String[] rules = parts[0].split(REGEX_NEW_LINE);
-        List<String> ready = new ArrayList<>();
-        ready.add("");
         Map<Integer, Rule> allRules = new HashMap<>();
         Map<Integer, String> base = base(rules);
         base.put(8, " 42 | 42 8");
         base.put(11, " 42 31 | 42 11 31");
-        trueStrings(ready, 0, allRules, base);
-        ready.remove(ready.size() - 1);
+        String regex = regex(0, allRules, base);
         int result = 0;
-        String[] strings = parts[1].split(REGEX_NEW_LINE);
-        for (String string : strings) {
-            if (ready.contains(string)) {
+        for (String s : parts[1].split(REGEX_NEW_LINE)) {
+            if (Pattern.matches(regex, s)) {
                 result++;
             }
         }
         return String.valueOf(result);
+//        trueStrings(ready, 0, allRules, base);
+//        ready.remove(ready.size() - 1);
+//        int result = 0;
+//        String[] strings = parts[1].split(REGEX_NEW_LINE);
+//        for (String string : strings) {
+//            if (ready.contains(string)) {
+//                result++;
+//            }
+//        }
     }
 
-    private static void trueStrings(List<String> ready, int number, Map<Integer, Rule> allRules, Map<Integer, String> base) {
-        if (!allRules.containsKey(number)) {
-            addRule(number, allRules, base);
-        }
+    private static String regex(int number, Map<Integer, Rule> allRules, Map<Integer, String> base) {
+        addRule(number, allRules, base);
         Rule currentRule = allRules.get(number);
-        if (currentRule.c != '\0') {
-            ready.replaceAll(s -> s + currentRule.c);
-        }
-        if (currentRule.rules != null) {
-            List<String> addReady = new ArrayList<>(ready);
-            for (Rule rule : currentRule.rules) {
-                trueStrings(addReady, rule.number, allRules, base);
-            }
-            List<String> addReady2 = new ArrayList<>(ready);
-            if (currentRule.altRules != null) {
-                for (Rule rule : currentRule.altRules) {
-                    trueStrings(addReady2, rule.number, allRules, base);
-                }
-            }
-            ready.clear();
-            ready.addAll(addReady);
-            ready.addAll(addReady2);
-        }
+        return currentRule.toString();
     }
 
     private static void addRule(int number, Map<Integer, Rule> allRules, Map<Integer, String> base) {
         Rule rule = new Rule(number);
-        if (rule.rules == null && rule.c == '\0') {
-            addDescription(number, rule, allRules, base);
-        }
+        addDescription(number, rule, allRules, base);
         allRules.put(number, rule);
     }
 
     private static void addDescription(int number, Rule rule, Map<Integer, Rule> allRules, Map<Integer, String> base) {
         String[] split = base.get(number).split(" ");
-        if (split[1].contains("\"")) {
+        if (number == 8) {
+            rule.setRules(listRules(split, 1, 2), allRules, base);
+        } else if (number == 11) {
+            rule.setRules(listRules(split, 1, 3), allRules, base);
+        } else if (split[1].contains("\"")) {
             rule.setC(split[1].charAt(1));
         } else {
             int index = Arrays.asList(split).indexOf("|");
@@ -138,22 +122,48 @@ public class Day19 implements Puzzle {
 
         @Override
         public String toString() {
+            if (number == 8) {
+                StringBuilder stringRules = new StringBuilder();
+                for (Rule rule : rules) {
+                    stringRules.append(rule.toString());
+                }
+                return "(" + stringRules + ")+";
+            }
+            if (number == 11) {
+                return "(" + (rules.get(0)) + "{1}" + (rules.get(1)) + "{1})|(" +
+                        (rules.get(0)) + "{2}" + (rules.get(1)) + "{2})|(" +
+                        (rules.get(0)) + "{3}" + (rules.get(1)) + "{3})|(" +
+                        (rules.get(0)) + "{4}" + (rules.get(1)) + "{4})|(" +
+                        (rules.get(0)) + "{5}" + (rules.get(1)) + "{5})|(" +
+                        (rules.get(0)) + "{6}" + (rules.get(1)) + "{6})|(" +
+                        (rules.get(0)) + "{7}" + (rules.get(1)) + "{7})|(" +
+                        (rules.get(0)) + "{8}" + (rules.get(1)) + "{8})|(" +
+                        (rules.get(0)) + "{9}" + (rules.get(1)) + "{9})|(" +
+                        (rules.get(0)) + "{10}" + (rules.get(1)) + "{10})";
+            }
             if (rules == null) {
-                return "Rule{" +
-                        "c=" + c +
-                        '}';
+                return String.valueOf(c);
             }
-            if (altRules == null) {
-                return "Rule{" +
-                        "number=" + number +
-                        ", rules=" + rules +
-                        '}';
+            if (altRules == null || altRules.size() == 0) {
+                StringBuilder stringRules = new StringBuilder();
+                for (Rule rule : rules) {
+                    stringRules.append(rule.toString());
+                }
+                return String.valueOf(stringRules);
             }
-            return "Rule{" +
-                    "number=" + number +
-                    ", rules=" + rules +
-                    ", altRules=" + altRules +
-                    '}';
+            StringBuilder stringRules = new StringBuilder();
+            for (Rule rule : rules) {
+                stringRules.append(rule.toString());
+            }
+            StringBuilder stringAltRules = new StringBuilder();
+            for (Rule rule : altRules) {
+                stringAltRules.append(rule.toString());
+            }
+            return "(" +
+                    stringRules +
+                    "|" +
+                    stringAltRules +
+                    ")";
         }
 
         public Rule(int number) {
