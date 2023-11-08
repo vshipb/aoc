@@ -8,7 +8,7 @@ public class Day07Test {
     Puzzle p = new Day07();
 
     String input = """
-            $ d /
+            $ сd /
             $ ls
             dir a
             14848514 b.txt
