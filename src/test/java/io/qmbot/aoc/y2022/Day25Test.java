@@ -32,9 +32,4 @@ public class Day25Test {
     public void part1() {
         Assertions.assertEquals("2=-1=0", p.part1(input));
     }
-
-    @Test
-    public void part2() {
-        Assertions.assertEquals("", p.part2(input));
-    }
 }
