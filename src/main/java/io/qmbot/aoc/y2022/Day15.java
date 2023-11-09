@@ -4,7 +4,6 @@ import io.qmbot.aoc.Puzzle;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.function.LongFunction;
 
 public class Day15 implements Puzzle {
     @Override
