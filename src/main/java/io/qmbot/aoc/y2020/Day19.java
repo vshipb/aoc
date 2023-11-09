@@ -50,28 +50,48 @@ public class Day19 implements Puzzle {
         return currentRule.toString();
     }
 
-    private static void addRule(int number, Map<Integer, Rule> allRules, Map<Integer, String> base) {
-        String[] split = base.get(number).split(" ");
+    Rule parseRule(String str, Map<Integer, Rule> allRules) {
+        String[] split = str.split(" ");
+        int number = Integer.parseInt(split[0].substring(0, split[0].length() - 1));
         if (number == 8) {
-            Rule8 rule = new Rule8(split, allRules, base);
-            allRules.put(number, rule);
+            return new Rule8(split, allRules, base);
         } else if (number == 11) {
-            Rule11 rule = new Rule11(split, allRules, base);
-            allRules.put(number, rule);
+            return new Rule11(split, allRules, base);
         } else if (split[1].contains("\"")) {
-            CharRule rule = new CharRule(split[1].charAt(1));
-            allRules.put(number, rule);
+            return new CharRule(split[1].charAt(1));
         } else {
             int index = Arrays.asList(split).indexOf("|");
             if (index > 0) {
-                OrRule rule = new OrRule(index, split, allRules, base);
-                allRules.put(number, rule);
+                String[] splitted = str.split("|");
+                return new OrRule(parseRule(splitted[0].trim(), allRules), parseRule(splitted[1].trim(), allRules));
             } else {
-                SequenceRule rule = new SequenceRule(split, allRules, base);
-                allRules.put(number, rule);
+                return new SequenceRule(split, allRules, base);
             }
         }
     }
+
+//    private static void addRule(int number, Map<Integer, Rule> allRules, Map<Integer, String> base) {
+//        String[] split = base.get(number).split(" ");
+//        if (number == 8) {
+//            Rule8 rule = new Rule8(split, allRules, base);
+//            allRules.put(number, rule);
+//        } else if (number == 11) {
+//            Rule11 rule = new Rule11(split, allRules, base);
+//            allRules.put(number, rule);
+//        } else if (split[1].contains("\"")) {
+//            CharRule rule = new CharRule(split[1].charAt(1));
+//            allRules.put(number, rule);
+//        } else {
+//            int index = Arrays.asList(split).indexOf("|");
+//            if (index > 0) {
+//                OrRule rule = new OrRule(index, split, allRules, base);
+//                allRules.put(number, rule);
+//            } else {
+//                SequenceRule rule = new SequenceRule(split, allRules, base);
+//                allRules.put(number, rule);
+//            }
+//        }
+//    }
 
     private static Map<Integer, String> base(String[] rules) {
         Map<Integer, String> base = new HashMap<>();
@@ -144,7 +164,7 @@ public class Day19 implements Puzzle {
         Rule first;
         Rule second;
         public SequenceRule(String[] split, Map<Integer, Rule> allRules, Map<Integer, String> base) {
-            this.rules = listRules(listNumbers(split, 1, split.length), allRules, base);
+
         }
 
         @Override
@@ -157,10 +177,9 @@ public class Day19 implements Puzzle {
         Rule rules;
         Rule altRules;
 
-        public OrRule(String[] split, Map<Integer, Rule> allRules, Map<Integer, String> base) {
-            int index = Arrays.asList(split).indexOf("|");
-            this.rules = listRules(listNumbers(split, 1, index), allRules, base);
-            this.altRules =listRules(listNumbers(split, index+ 1, split.length), allRules, base);
+        public OrRule(Rule rules, Rule altRules) {
+            this.rules = rules;
+            this.altRules = altRules;
         }
 
         @Override
