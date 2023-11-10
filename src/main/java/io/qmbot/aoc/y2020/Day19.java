@@ -3,6 +3,7 @@ package io.qmbot.aoc.y2020;
 import io.qmbot.aoc.Puzzle;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.StringJoiner;
 import java.util.regex.Pattern;
 
 public class Day19 implements Puzzle {
@@ -147,15 +148,11 @@ public class Day19 implements Puzzle {
 
         @Override
         public String regex() {
-            //StringJoiner
-            String str = "";
-            for (int i = 1; i < 2; i++) {
-                str += "(" + firstRule.regex() + "{" + i + "}" + secondRule.regex() + "{" + i + "})|";
+            StringJoiner str = new StringJoiner("|");
+            for (int i = 1; i < 10; i++) {
+                str.add("(" + firstRule.regex() + "{" + i + "}" + secondRule.regex() + "{" + i + "})");
             }
-            str = str.substring(0, str.length() - 2);
-            str += ")";
-
-            return str;
+            return "(" + str + ")";
         }
     }
 }
