@@ -1,12 +1,9 @@
 package io.qmbot.aoc.y2020;
 
 import io.qmbot.aoc.Puzzle;
-
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
-import java.util.regex.*;
+import java.util.regex.Pattern;
 
 public class Day19 implements Puzzle {
     @Override
@@ -14,7 +11,7 @@ public class Day19 implements Puzzle {
         String[] parts = input.split(REGEX_EMPTY_LINE);
         String[] rules = parts[0].split(REGEX_NEW_LINE);
         Map<Integer, Rule> allRules = new HashMap<>();
-        for (String rule : rules){
+        for (String rule : rules) {
             String[] r = rule.split(": ");
             allRules.put(Integer.valueOf(r[0]), parseRule(r[1], allRules));
         }
@@ -33,15 +30,12 @@ public class Day19 implements Puzzle {
         String[] parts = input.split(REGEX_EMPTY_LINE);
         String[] rules = parts[0].split(REGEX_NEW_LINE);
         Map<Integer, Rule> allRules = new HashMap<>();
-        for (String rule : rules){
+        for (String rule : rules) {
             String[] r = rule.split(": ");
             allRules.put(Integer.valueOf(r[0]), parseRule(r[1], allRules));
         }
         allRules.put(8, new Rule8(new RefRule(42, allRules)));
         allRules.put(11, new Rule11(new RefRule(42, allRules), new RefRule(31, allRules)));
-//        Map<Integer, String> base = base(rules);
-//        base.put(8, " 42 | 42 8");
-//        base.put(11, " 42 31 | 42 11 31");
         String regex = allRules.get(0).regex();
         int result = 0;
         for (String s : parts[1].split(REGEX_NEW_LINE)) {
@@ -59,7 +53,7 @@ public class Day19 implements Puzzle {
         } else if (str.contains(" ")) {
             String[] split = str.split(" ", 2);
             return new SequenceRule(parseRule(split[0].trim(), allRules), parseRule(split[1].trim(), allRules));
-        } else if (str.contains("\"")){
+        } else if (str.contains("\"")) {
             return new CharRule(str.charAt(1));
         } else {
             return new RefRule(Integer.parseInt(str), allRules);
@@ -87,15 +81,15 @@ public class Day19 implements Puzzle {
     }
 
     static class CharRule extends Rule {
-        char c;
+        char ch;
 
-        public CharRule(char c) {
-            this.c = c;
+        public CharRule(char ch) {
+            this.ch = ch;
         }
 
         @Override
         public String regex() {
-            return "(" + c + ")";
+            return "(" + ch + ")";
         }
     }
 
@@ -153,8 +147,14 @@ public class Day19 implements Puzzle {
 
         @Override
         public String regex() {
-            return "(" + firstRule.regex() + "{1}" + secondRule.regex() + "{1})|(" +
-                    firstRule.regex() + "{10}" + secondRule.regex() + "{10})";
+            String str = "";
+            for (int i = 1; i < 1000; i++) {
+                str += "(" + firstRule.regex() + "{" + i + "}" + secondRule.regex() + "{" + i + "})|";
+            }
+            str = str.substring(0, str.length() - 2);
+            str += ")";
+
+            return str;
         }
     }
 }
