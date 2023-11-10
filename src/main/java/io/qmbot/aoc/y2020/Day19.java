@@ -89,7 +89,7 @@ public class Day19 implements Puzzle {
 
         @Override
         public String regex() {
-            return "(" + ch + ")";
+            return String.valueOf(ch);
         }
     }
 
@@ -104,7 +104,7 @@ public class Day19 implements Puzzle {
 
         @Override
         public String regex() {
-            return "(" + first.regex() + second.regex() + ")";
+            return first.regex() + second.regex() ;
         }
     }
 
@@ -147,8 +147,9 @@ public class Day19 implements Puzzle {
 
         @Override
         public String regex() {
+            //StringJoiner
             String str = "";
-            for (int i = 1; i < 1000; i++) {
+            for (int i = 1; i < 2; i++) {
                 str += "(" + firstRule.regex() + "{" + i + "}" + secondRule.regex() + "{" + i + "})|";
             }
             str = str.substring(0, str.length() - 2);
