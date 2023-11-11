@@ -11,7 +11,7 @@ import java.util.stream.Collectors;
 
 public class Day24 implements Puzzle {
     @Override
-    public String part1(String input) {
+    public Integer part1(String input) {
         String[] splitInput = input.split("\n");
 
         Blizzards[][] field = field(splitInput);
@@ -21,11 +21,11 @@ public class Day24 implements Puzzle {
 
         Blizzards[][][] fieldInTime = fieldInTime(findLCM(maxY - 2, maxX - 2), maxY, maxX, field);
 
-        return String.valueOf(findPath(fieldInTime, new Position(0, 0, 1), maxY - 1, maxX - 2));
+        return findPath(fieldInTime, new Position(0, 0, 1), maxY - 1, maxX - 2);
     }
 
     @Override
-    public String part2(String input) {
+    public Integer part2(String input) {
         String[] splitInput = input.split("\n");
 
         Blizzards[][] field = field(splitInput);
@@ -37,9 +37,8 @@ public class Day24 implements Puzzle {
 
         int a = findPath(fieldInTime, new Position(0, 0, 1), maxY - 1, maxX - 2);
         int b = findPath(fieldInTime, new Position(a, maxY - 1, maxX - 2), 0, 1);
-        int c = findPath(fieldInTime, new Position(b, 0, 1), maxY - 1, maxX - 2);
 
-        return String.valueOf(c);
+        return findPath(fieldInTime, new Position(b, 0, 1), maxY - 1, maxX - 2);
     }
 
     static int findPath(Blizzards[][][] fieldInTime, Position start, int y, int x) {

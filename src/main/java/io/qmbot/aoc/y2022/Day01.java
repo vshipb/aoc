@@ -5,18 +5,18 @@ import java.util.Arrays;
 
 public class Day01 implements Puzzle {
     @Override
-    public String part1(String input) {
-        return Long.toString(Arrays.stream(input.split(REGEX_NEW_LINE + REGEX_NEW_LINE))
-                .mapToLong(s -> s.lines().mapToLong(Long::parseLong).sum())
-                .max().orElseThrow());
+    public Integer part1(String input) {
+        return Arrays.stream(input.split(REGEX_NEW_LINE + REGEX_NEW_LINE))
+                .mapToInt(s -> s.lines().mapToInt(Integer::parseInt).sum())
+                .max().orElseThrow();
     }
 
     @Override
-    public String part2(String input) {
-        long[] sort = Arrays.stream(input.split(REGEX_NEW_LINE + REGEX_NEW_LINE))
-                .mapToLong(s -> s.lines().mapToLong(Long::parseLong).sum())
+    public Integer part2(String input) {
+        int[] sort = Arrays.stream(input.split(REGEX_NEW_LINE + REGEX_NEW_LINE))
+                .mapToInt(s -> s.lines().mapToInt(Integer::parseInt).sum())
                 .sorted().toArray();
         int length = sort.length;
-        return Long.toString(sort[length - 1] + sort[length - 2] + sort[length - 3]);
+        return sort[length - 1] + sort[length - 2] + sort[length - 3];
     }
 }

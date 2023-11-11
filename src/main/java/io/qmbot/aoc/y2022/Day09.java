@@ -7,13 +7,13 @@ public class Day09 implements Puzzle {
     private static final int SIZE = 1000;
 
     @Override
-    public String part1(String input) {
-        return Integer.toString(new Field(2).move(input).positions());
+    public Integer part1(String input) {
+        return new Field(2).move(input).positions();
     }
 
     @Override
-    public String part2(String input) {
-        return Integer.toString(new Field(10).move(input).positions());
+    public Integer part2(String input) {
+        return new Field(10).move(input).positions();
     }
 
     static class Field {

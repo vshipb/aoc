@@ -8,23 +8,23 @@ import java.util.stream.Stream;
 
 public class Day20 implements Puzzle {
     @Override
-    public String part1(String input) {
+    public Long part1(String input) {
         return mixing(input, 1, 1);
     }
 
     @Override
-    public String part2(String input) {
+    public Long part2(String input) {
         return mixing(input, 811589153, 10);
     }
 
-    private static String mixing(String input, int key, int repeat) {
+    private static Long mixing(String input, int key, int repeat) {
         List<AtomicLong> list = parseInput(input, key);
         List<AtomicLong> initialList = list.stream().toList();
         int length = list.size();
         for (int j = 0; j < repeat; j++) {
             mix(length, list, initialList);
         }
-        return String.valueOf(answer(list, length, zeroIndex(length, list)));
+        return answer(list, length, zeroIndex(length, list));
     }
 
     static long answer(List<AtomicLong> list, int length, int zeroIndex) {

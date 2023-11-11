@@ -5,18 +5,18 @@ import java.util.Arrays;
 
 public class Day03 implements Puzzle {
     @Override
-    public String part1(String input) {
-        return String.valueOf(Arrays.stream(input.split(REGEX_NEW_LINE)).mapToInt(string -> priority(sameItem(string))).sum());
+    public Integer part1(String input) {
+        return Arrays.stream(input.split(REGEX_NEW_LINE)).mapToInt(string -> priority(sameItem(string))).sum();
     }
 
     @Override
-    public String part2(String input) {
+    public Integer part2(String input) {
         int sum = 0;
         String[] strings = input.split(REGEX_NEW_LINE);
         for (int i = 0; i < strings.length; i = i + 3) {
             sum += priority(sameItem(strings[i], strings[i + 1], strings[i + 2]));
         }
-        return String.valueOf(sum);
+        return sum;
     }
 
     private static char sameItem(String string) {

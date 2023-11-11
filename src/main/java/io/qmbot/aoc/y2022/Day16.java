@@ -13,21 +13,21 @@ import java.util.Set;
 
 public class Day16 implements Puzzle {
     @Override
-    public String part1(String input) {
+    public Integer part1(String input) {
         Map<String, Valve> valves = new HashMap<>();
         List<String> flowMoreThanZero = new ArrayList<>();
         parseInput(valves, flowMoreThanZero, input);
         fillDestinations(valves);
-        return String.valueOf(star(valves, flowMoreThanZero, 30));
+        return star(valves, flowMoreThanZero, 30);
     }
 
     @Override
-    public String part2(String input) {
+    public Integer part2(String input) {
         Map<String, Valve> valves = new HashMap<>();
         List<String> flowMoreThanZero = new ArrayList<>();
         parseInput(valves, flowMoreThanZero, input);
         fillDestinations(valves);
-        return String.valueOf(withElephant(flowMoreThanZero, valves, 26));
+        return withElephant(flowMoreThanZero, valves, 26);
     }
 
     int withElephant(List<String> list, Map<String, Valve> valves, int time) {

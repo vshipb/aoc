@@ -8,15 +8,15 @@ import java.util.stream.Stream;
 
 public class Day07 implements Puzzle {
     @Override
-    public String part1(String input) {
-        return String.valueOf(dir(input).allDirs().stream().mapToLong(Directory::size).filter(s -> s < 100000).sum());
+    public Integer part1(String input) {
+        return dir(input).allDirs().stream().mapToInt(Directory::size).filter(s -> s < 100000).sum();
     }
 
     @Override
-    public String part2(String input) {
+    public Integer part2(String input) {
         Directory root = dir(input);
-        return String.valueOf(root.allDirs().stream().filter(d -> d != root).mapToLong(Directory::size)
-                .filter(s -> s > root.size() - 40000000).min().orElse(root.size()));
+        return root.allDirs().stream().filter(d -> d != root).mapToInt(Directory::size)
+                .filter(s -> s > root.size() - 40000000).min().orElse(root.size());
     }
 
     private static Directory dir(String input) {
@@ -52,7 +52,7 @@ public class Day07 implements Puzzle {
             this.name = name;
         }
 
-        abstract long size();
+        abstract int size();
     }
 
     static class File extends Entry {
@@ -64,7 +64,7 @@ public class Day07 implements Puzzle {
         }
 
         @Override
-        long size() {
+        int size() {
             return size;
         }
     }
@@ -77,8 +77,8 @@ public class Day07 implements Puzzle {
         }
 
         @Override
-        long size() {
-            return children.stream().mapToLong(Entry::size).sum();
+        int size() {
+            return children.stream().mapToInt(Entry::size).sum();
         }
 
         List<Directory> allDirs() {

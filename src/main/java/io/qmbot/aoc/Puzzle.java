@@ -5,7 +5,7 @@ public interface Puzzle {
 
     String REGEX_EMPTY_LINE = "\n\n";
 
-    String part1(String input);
+    Object part1(String input);
 
-    String part2(String input);
+    Object part2(String input);
 }

@@ -5,8 +5,8 @@ import java.util.Arrays;
 
 public class Day02 implements Puzzle {
     @Override
-    public String part1(String input) {
-        return String.valueOf(Arrays.stream(input.split(REGEX_NEW_LINE)).mapToInt(round -> switch (round) {
+    public Integer part1(String input) {
+        return Arrays.stream(input.split(REGEX_NEW_LINE)).mapToInt(round -> switch (round) {
             case "A X" -> 1 + 3;
             case "A Y" -> 2 + 6;
             case "A Z" -> 3;
@@ -17,12 +17,12 @@ public class Day02 implements Puzzle {
             case "C Y" -> 2;
             case "C Z" -> 3 + 3;
             default -> throw new IllegalArgumentException();
-        }).sum());
+        }).sum();
     }
 
     @Override
-    public String part2(String input) {
-        return String.valueOf(Arrays.stream(input.split(REGEX_NEW_LINE)).mapToInt(round -> switch (round) {
+    public Integer part2(String input) {
+        return Arrays.stream(input.split(REGEX_NEW_LINE)).mapToInt(round -> switch (round) {
             case "A X" -> 3;
             case "A Y" -> 1 + 3;
             case "A Z" -> 2 + 6;
@@ -33,6 +33,6 @@ public class Day02 implements Puzzle {
             case "C Y" -> 3 + 3;
             case "C Z" -> 1 + 6;
             default -> throw new IllegalArgumentException();
-        }).sum());
+        }).sum();
     }
 }

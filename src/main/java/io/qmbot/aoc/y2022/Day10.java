@@ -7,7 +7,7 @@ import java.util.stream.Collectors;
 
 public class Day10 implements Puzzle {
     @Override
-    public String part1(String input) {
+    public Integer part1(String input) {
         List<String> commands = Arrays.stream(input.split(REGEX_NEW_LINE)).flatMap(line -> Arrays.stream(line.split(" "))).toList();
         int x = 1;
         int cycles = 0;
@@ -22,7 +22,7 @@ public class Day10 implements Puzzle {
             }
             x = addX(x, cmd);
         }
-        return Integer.toString(signals);
+        return signals;
     }
 
     @Override

@@ -34,11 +34,11 @@ public class Day13Test {
 
     @Test
     public void part1(){
-        Assertions.assertEquals("13", p.part1(input));
+        Assertions.assertEquals(13, p.part1(input));
     }
 
     @Test
     public void part2(){
-        Assertions.assertEquals("140", p.part2(input));
+        Assertions.assertEquals(140, p.part2(input));
     }
 }

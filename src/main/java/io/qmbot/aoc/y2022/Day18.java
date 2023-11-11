@@ -11,7 +11,7 @@ import java.util.stream.Stream;
 
 public class Day18 implements Puzzle {
     @Override
-    public String part1(String input) {
+    public Integer part1(String input) {
         boolean[][][] lava = new boolean[20][20][20];
 
         List<Point> points = new ArrayList<>();
@@ -25,11 +25,11 @@ public class Day18 implements Puzzle {
             points.add(new Point(crd[0], crd[1], crd[2]));
         }
 
-        return String.valueOf(result(lava, points));
+        return result(lava, points);
     }
 
     @Override
-    public String part2(String input) {
+    public Integer part2(String input) {
         int size = 30;
         boolean[][][] lava = new boolean[size][size][size];
         int[][][] water = new int[size][size][size];
@@ -53,7 +53,7 @@ public class Day18 implements Puzzle {
             }
         }
 
-        return String.valueOf(result(lava, points) - 6 * size * size);
+        return result(lava, points) - 6 * size * size;
     }
 
     private int result(boolean[][][] lava, List<Point> points) {
