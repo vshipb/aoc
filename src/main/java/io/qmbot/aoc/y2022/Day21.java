@@ -6,13 +6,13 @@ import java.util.Map;
 
 public class Day21 implements Puzzle {
     @Override
-    public String part1(String input) {
+    public Long part1(String input) {
         Map<String, Monkey> monkeys = monkeys(input);
-        return String.valueOf((long) monkeys.get("root").yell(monkeys));
+        return (long) monkeys.get("root").yell(monkeys);
     }
 
     @Override
-    public String part2(String input) {
+    public Long part2(String input) {
         long low = -(long) Integer.MAX_VALUE * 1024 * 1024;
         long high = (long) Integer.MAX_VALUE * 1024 * 1024;
         long humn;
@@ -41,7 +41,7 @@ public class Day21 implements Puzzle {
             }
         }
 
-        return String.valueOf(humn);
+        return humn;
     }
 
     private static Map<String, Monkey> monkeys(String input) {

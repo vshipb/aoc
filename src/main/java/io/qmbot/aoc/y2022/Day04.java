@@ -7,19 +7,19 @@ public class Day04 implements Puzzle {
     private static final String REGEX = "[,-]";
 
     @Override
-    public String part1(String input) {
-        return String.valueOf(Arrays.stream(input.split(REGEX_NEW_LINE)).mapToInt(line -> {
+    public Integer part1(String input) {
+        return Arrays.stream(input.split(REGEX_NEW_LINE)).mapToInt(line -> {
             int[] elves = Arrays.stream(line.split(REGEX)).mapToInt(Integer::parseInt).toArray();
             return fullyContains(elves[0], elves[1], elves[2], elves[3]) ? 1 : 0;
-        }).sum());
+        }).sum();
     }
 
     @Override
-    public String part2(String input) {
-        return String.valueOf(Arrays.stream(input.split(REGEX_NEW_LINE)).mapToInt(line -> {
+    public Integer part2(String input) {
+        return Arrays.stream(input.split(REGEX_NEW_LINE)).mapToInt(line -> {
             int[] elves = Arrays.stream(line.split(REGEX)).mapToInt(Integer::parseInt).toArray();
             return overlapAtAll(elves[0], elves[1], elves[2], elves[3]) ? 1 : 0;
-        }).sum());
+        }).sum();
     }
 
     static boolean fullyContains(int firstStart, int firstEnd, int secondStart, int secondEnd) {

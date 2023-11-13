@@ -39,11 +39,11 @@ public class Day20Test {
 
     @Test
     public void part1() {
-        assertEquals("3", p.part1(input));
+        assertEquals(3L, p.part1(input));
     }
 
     @Test
     public void part2() {
-        assertEquals("1623178306", p.part2(input));
+        assertEquals(1623178306L, p.part2(input));
     }
 }

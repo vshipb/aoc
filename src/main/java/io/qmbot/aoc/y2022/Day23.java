@@ -12,7 +12,7 @@ import java.util.stream.Stream;
 
 public class Day23 implements Puzzle {
     @Override
-    public String part1(String input) {
+    public Integer part1(String input) {
         List<Elf> elves = parseInput(input);
         Direction mainDirection = Direction.North;
         for (int i = 0; i < 10; i++) {
@@ -24,17 +24,17 @@ public class Day23 implements Puzzle {
                 - elves.stream().mapToInt(elf -> elf.current.x).min().orElseThrow() + 1;
         int y = elves.stream().mapToInt(elf -> elf.current.y).max().orElseThrow()
                 - elves.stream().mapToInt(elf -> elf.current.y).min().orElseThrow() + 1;
-        return String.valueOf((x * y) - elves.size());
+        return (x * y) - elves.size();
     }
 
     @Override
-    public String part2(String input) {
+    public Integer part2(String input) {
         List<Elf> elves = parseInput(input);
         Direction mainDirection = Direction.North;
         int i = 0;
         while (true) {
             i++;
-            if (firstHalf(elves, mainDirection)) return String.valueOf(i);
+            if (firstHalf(elves, mainDirection)) return i;
             secondHalf(elves);
             mainDirection = mainDirection.nextDirection();
         }

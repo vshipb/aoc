@@ -5,7 +5,7 @@ import java.util.Arrays;
 
 public class Day22 implements Puzzle {
     @Override
-    public String part1(String input) {
+    public Integer part1(String input) {
         String[] splitInput = input.split("\n\n");
         String[] lines = splitInput[0].split("\n");
         String directions = splitInput[1];
@@ -110,11 +110,11 @@ public class Day22 implements Puzzle {
         int facing = me.direction.ordinal();
 
         int result = row * 1000 + column * 4 + facing;
-        return String.valueOf(result);
+        return result;
     }
-
+  
     @Override
-    public String part2(String input) {
+    public Integer part2(String input) {
         String[] splitInput = input.split("\n\n");
         String[] lines = splitInput[0].split("\n");
         String directions = splitInput[1];
@@ -285,10 +285,8 @@ public class Day22 implements Puzzle {
         int column = (me.square.coordinateOnBoard.pointX * (size + 1)) + me.point.pointX + 1;
         int facing = me.direction.ordinal();
 
-        int result = row * 1000 + column * 4 + facing;
-        return String.valueOf(result);
+        return row * 1000 + column * 4 + facing;
     }
-
 
     enum Direction {
         East(0, 1) {

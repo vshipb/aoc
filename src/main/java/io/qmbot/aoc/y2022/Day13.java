@@ -7,7 +7,7 @@ import java.util.List;
 
 public class Day13 implements Puzzle {
     @Override
-    public String part1(String input) {
+    public Integer part1(String input) {
         List<String> strings = List.of(input.split("\n"));
         Packet packetLeft;
         Packet packetRight;
@@ -23,11 +23,11 @@ public class Day13 implements Puzzle {
                 trueResult = trueResult + numberOfPair;
             }
         }
-        return String.valueOf(trueResult);
+        return trueResult;
     }
 
     @Override
-    public String part2(String input) {
+    public Integer part2(String input) {
         List<String> strings = List.of(input.split("\n"));
         List<Packet> allPacks = new ArrayList<>();
         for (int i = 0; i < strings.size(); i = i + 3) {
@@ -48,7 +48,7 @@ public class Day13 implements Puzzle {
                 index6 = i + 1;
             }
         }
-        return String.valueOf(index2 * index6);
+        return index2 * index6;
     }
 
     abstract static class Entry implements Comparable<Entry> {

@@ -157,7 +157,7 @@ public class Day10Test {
 
     @Test
     public void part1(){
-        Assertions.assertEquals("13140", p.part1(input));
+        Assertions.assertEquals(13140, p.part1(input));
     }
 
     @Test

@@ -4,7 +4,7 @@ import io.qmbot.aoc.Puzzle;
 
 public class Day08 implements Puzzle {
     @Override
-    public String part1(String input) {
+    public Integer part1(String input) {
         int[][] forest = forest(input);
         int size = forest.length;
         int visible = 0;
@@ -18,11 +18,11 @@ public class Day08 implements Puzzle {
                 }
             }
         }
-        return Integer.toString(visible);
+        return visible;
     }
 
     @Override
-    public String part2(String input) {
+    public Integer part2(String input) {
         int[][] forest = forest(input);
         int size = forest.length;
         int bestPlace = 0;
@@ -38,7 +38,7 @@ public class Day08 implements Puzzle {
                 }
             }
         }
-        return String.valueOf(bestPlace);
+        return bestPlace;
     }
 
     private static int[][] forest(String input) {
