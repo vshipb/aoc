@@ -105,7 +105,7 @@ public class Day19 implements Puzzle {
 
         @Override
         public String regex() {
-            return first.regex() + second.regex() ;
+            return first.regex() + second.regex();
         }
     }
 
