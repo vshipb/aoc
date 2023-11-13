@@ -8,7 +8,7 @@ import java.util.regex.Pattern;
 
 public class Day19 implements Puzzle {
     @Override
-    public String part1(String input) {
+    public Integer part1(String input) {
         String[] parts = input.split(REGEX_EMPTY_LINE);
         String[] rules = parts[0].split(REGEX_NEW_LINE);
         Map<Integer, Rule> allRules = new HashMap<>();
@@ -23,11 +23,11 @@ public class Day19 implements Puzzle {
                 result++;
             }
         }
-        return String.valueOf(result);
+        return result;
     }
 
     @Override
-    public String part2(String input) {
+    public Integer part2(String input) {
         String[] parts = input.split(REGEX_EMPTY_LINE);
         String[] rules = parts[0].split(REGEX_NEW_LINE);
         Map<Integer, Rule> allRules = new HashMap<>();
@@ -44,7 +44,7 @@ public class Day19 implements Puzzle {
                 result++;
             }
         }
-        return String.valueOf(result);
+        return result;
     }
 
     static Rule parseRule(String str, Map<Integer, Rule> allRules) {

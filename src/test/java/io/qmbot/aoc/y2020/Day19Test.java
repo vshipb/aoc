@@ -7,7 +7,7 @@ import org.junit.jupiter.api.Test;
 public class Day19Test {
     Puzzle p = new Day19();
 
-    String input = """
+    String input2 = """
             42: 9 14 | 10 1
             9: 14 27 | 1 26
             10: 23 14 | 28 1
@@ -55,7 +55,7 @@ public class Day19Test {
             aaaabbaabbaaaaaaabbbabbbaaabbaabaaa
             babaaabbbaaabaababbaabababaaab
             aabbbbbaabbbaaaaaabbbbbababaaaaabbaaabba""";
-    String input2 = """
+    String input = """
             0: 4 1 5
             1: 2 3 | 3 2
             2: 4 4 | 5 5
@@ -71,11 +71,11 @@ public class Day19Test {
 
     @Test
     public void part1(){
-        Assertions.assertEquals("2", p.part1(input2));
+        Assertions.assertEquals(2, p.part1(input));
     }
 
     @Test
     void part2(){
-        Assertions.assertEquals("12", p.part2(input));
+        Assertions.assertEquals(12, p.part2(input2));
     }
 }
