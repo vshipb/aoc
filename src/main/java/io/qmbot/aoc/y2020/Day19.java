@@ -1,50 +1,38 @@
 package io.qmbot.aoc.y2020;
 
 import io.qmbot.aoc.Puzzle;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.StringJoiner;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 public class Day19 implements Puzzle {
     @Override
     public Integer part1(String input) {
         String[] parts = input.split(REGEX_EMPTY_LINE);
-        String[] rules = parts[0].split(REGEX_NEW_LINE);
-        Map<Integer, Rule> allRules = new HashMap<>();
-        for (String rule : rules) {
-            String[] r = rule.split(": ");
-            allRules.put(Integer.valueOf(r[0]), parseRule(r[1], allRules));
-        }
-        String regex = allRules.get(0).regex();
-        int result = 0;
-        for (String s : parts[1].split(REGEX_NEW_LINE)) {
-            if (Pattern.matches(regex, s)) {
-                result++;
-            }
-        }
-        return result;
+        return (int) Arrays.stream(parts[1].split(REGEX_NEW_LINE))
+                .filter(s -> Pattern.matches(allRules(parts[0]).get(0).regex(), s)).count();
     }
 
     @Override
     public Integer part2(String input) {
         String[] parts = input.split(REGEX_EMPTY_LINE);
-        String[] rules = parts[0].split(REGEX_NEW_LINE);
+        Map<Integer, Rule> allRules = allRules(parts[0]);
+        allRules.put(8, new Rule8(new RefRule(42, allRules)));
+        allRules.put(11, new Rule11(new RefRule(42, allRules), new RefRule(31, allRules)));
+        return (int) Arrays.stream(parts[1].split(REGEX_NEW_LINE))
+                .filter(s -> Pattern.matches(allRules.get(0).regex(), s)).count();
+    }
+
+    static Map<Integer, Rule> allRules(String blueprint) {
         Map<Integer, Rule> allRules = new HashMap<>();
-        for (String rule : rules) {
+        for (String rule : blueprint.split(REGEX_NEW_LINE)) {
             String[] r = rule.split(": ");
             allRules.put(Integer.valueOf(r[0]), parseRule(r[1], allRules));
         }
-        allRules.put(8, new Rule8(new RefRule(42, allRules)));
-        allRules.put(11, new Rule11(new RefRule(42, allRules), new RefRule(31, allRules)));
-        String regex = allRules.get(0).regex();
-        int result = 0;
-        for (String s : parts[1].split(REGEX_NEW_LINE)) {
-            if (Pattern.matches(regex, s)) {
-                result++;
-            }
-        }
-        return result;
+        return allRules;
     }
 
     static Rule parseRule(String str, Map<Integer, Rule> allRules) {
@@ -148,11 +136,9 @@ public class Day19 implements Puzzle {
 
         @Override
         public String regex() {
-            StringJoiner str = new StringJoiner("|");
-            for (int i = 1; i < 10; i++) {
-                str.add("(" + firstRule.regex() + "{" + i + "}" + secondRule.regex() + "{" + i + "})");
-            }
-            return "(" + str + ")";
+            return IntStream.range(1, 10)
+                    .mapToObj(i -> String.format("(%s{%d}%s{%d})", firstRule.regex(), i, secondRule.regex(), i))
+                    .collect(Collectors.joining("|", "(", ")"));
         }
     }
 }
