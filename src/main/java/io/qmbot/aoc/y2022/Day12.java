@@ -9,43 +9,54 @@ import java.util.function.BiFunction;
 public class Day12 implements Puzzle {
     @Override
     public Integer part1(String input) {
-        List<String> strings = List.of(input.split(REGEX_NEW_LINE));
-        int stringSize = strings.size();
-        int stringLength = strings.get(0).length();
-        char[][] charField = new char[stringSize][stringLength];
-        int[][] stepField = new int[stringSize][stringLength];
-        List<Point> startAndEndPoints = startAndEndPoints(strings, charField);
-        Point startPoint = startAndEndPoints.get(0);
-        Point endPoint = startAndEndPoints.get(1);
-        List<Point> points = List.of(new Point(startPoint.x, startPoint.y));
-        while (true) {
-            points = check(charField, stepField, points,
-                    (Point point, Point neighbor) -> charField[point.y][point.x] + 1 >=  charField[neighbor.y][neighbor.x]);
-            if (stepField[endPoint.y][endPoint.x] > 0)
-                return stepField[endPoint.y][endPoint.x];
-        }
+        return new Field(List.of(input.split(REGEX_NEW_LINE))).stepsToTop();
     }
 
     @Override
     public Integer part2(String input) {
-        List<String> strings = List.of(input.split(REGEX_NEW_LINE));
-        int stringSize = strings.size();
-        int stringLength = strings.get(0).length();
-        char[][] charField = new char[stringSize][stringLength];
-        int[][] stepField = new int[stringSize][stringLength];
-        Point endPoint = startAndEndPoints(strings, charField).get(1);
-        List<Point> points = List.of(new Point(endPoint.x, endPoint.y));
-        while (true) {
-            points = check(charField, stepField, points,
-                    (Point point, Point neighbor) -> charField[point.y][point.x] - 1 <= charField[neighbor.y][neighbor.x]);
-            for (Point point : points) {
-                if (charField[point.y][point.x] == 'a')
-                    return stepField[point.y][point.x];
+        return new Field(List.of(input.split(REGEX_NEW_LINE))).stepsToBottom();
+    }
+
+    static class Field{
+        char[][] charField;
+        int[][] stepField;
+        Point startPoint;
+        Point endPoint;
+
+        public Field(List<String> strings) {
+            int stringSize = strings.size();
+            int stringLength = strings.get(0).length();
+            this.charField = new char[stringSize][stringLength];
+            this.stepField = new int[stringSize][stringLength];
+            List<Point> startAndEndPoints = startAndEndPoints(strings, charField);
+            this.startPoint = startAndEndPoints.get(0);
+            this.endPoint = startAndEndPoints.get(1);
+        }
+
+        int stepsToTop() {
+            List<Point> points = List.of(new Point(startPoint.x, startPoint.y));
+            while (true) {
+                points = check(charField, stepField, points,
+                        (Point point, Point neighbor) -> charField[point.y][point.x] + 1 >=  charField[neighbor.y][neighbor.x]);
+                if (stepField[endPoint.y][endPoint.x] > 0)
+                    return stepField[endPoint.y][endPoint.x];
+            }
+        }
+
+        int stepsToBottom() {
+            List<Point> points = List.of(new Point(endPoint.x, endPoint.y));
+            while (true) {
+                points = check(charField, stepField, points,
+                        (Point point, Point neighbor) -> charField[point.y][point.x] - 1 <= charField[neighbor.y][neighbor.x]);
+                for (Point point : points) {
+                    if (charField[point.y][point.x] == 'a')
+                        return stepField[point.y][point.x];
+                }
             }
         }
     }
 
-    List<Point> startAndEndPoints(List<String> strings, char[][] charField) {
+    static List<Point> startAndEndPoints(List<String> strings, char[][] charField) {
         Point startPoint = null; Point endPoint = null;
         for (int j = 0; j < strings.size(); j++) {
             String string = strings.get(j);
@@ -65,7 +76,6 @@ public class Day12 implements Puzzle {
     }
 
     record Point(int x, int y) {
-
         List<Point> neighbors(int sizeX, int sizeY) {
             List<Point> neighbors = new ArrayList<>();
             if (x > 0) neighbors.add(new Point(x - 1, y));
