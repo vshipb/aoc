@@ -17,7 +17,7 @@ public class Day12 implements Puzzle {
         return new Field(List.of(input.split(REGEX_NEW_LINE))).stepsToBottom();
     }
 
-    static class Field{
+    static class Field {
         char[][] charField;
         int[][] stepField;
         Point startPoint;
@@ -37,7 +37,7 @@ public class Day12 implements Puzzle {
             List<Point> points = List.of(new Point(startPoint.x, startPoint.y));
             while (true) {
                 points = check(charField, stepField, points,
-                        (Point point, Point neighbor) -> charField[point.y][point.x] + 1 >=  charField[neighbor.y][neighbor.x]);
+                        (Point point, Point neighbor) -> charField[point.y][point.x] + 1 >= charField[neighbor.y][neighbor.x]);
                 if (stepField[endPoint.y][endPoint.x] > 0)
                     return stepField[endPoint.y][endPoint.x];
             }
@@ -57,7 +57,8 @@ public class Day12 implements Puzzle {
     }
 
     static List<Point> startAndEndPoints(List<String> strings, char[][] charField) {
-        Point startPoint = null; Point endPoint = null;
+        Point startPoint = null;
+        Point endPoint = null;
         for (int j = 0; j < strings.size(); j++) {
             String string = strings.get(j);
             for (int i = 0; i < string.length(); i++) {
@@ -86,8 +87,9 @@ public class Day12 implements Puzzle {
         }
 
     }
-    
-    private static List<Point> check(char[][] charField, int[][] stepField, List<Point> nowPoints, BiFunction<Point, Point, Boolean> check) {
+
+    private static List<Point> check(char[][] charField, int[][] stepField, List<Point> nowPoints,
+                                     BiFunction<Point, Point, Boolean> check) {
         List<Point> newPoints = new ArrayList<>();
         for (Point point : nowPoints) {
             for (Point neighbor : point.neighbors(charField[0].length, charField.length)) {
