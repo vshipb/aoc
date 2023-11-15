@@ -8,18 +8,16 @@ import java.util.List;
 public class Day13 implements Puzzle {
     @Override
     public Integer part1(String input) {
-        List<String> strings = List.of(input.split("\n"));
+        List<String> strings = List.of(input.split(REGEX_NEW_LINE));
         Packet packetLeft;
         Packet packetRight;
         int trueResult = 0;
         int numberOfPair = 0;
-        int result;
         for (int i = 0; i < strings.size(); i = i + 3) {
             numberOfPair++;
             packetLeft = new Packet(strings.get(i));
             packetRight = new Packet(strings.get(i + 1));
-            result = packetRight.compareTo(packetLeft);
-            if (result == 1) {
+            if (packetRight.compareTo(packetLeft) > 0) {
                 trueResult = trueResult + numberOfPair;
             }
         }
@@ -28,7 +26,7 @@ public class Day13 implements Puzzle {
 
     @Override
     public Integer part2(String input) {
-        List<String> strings = List.of(input.split("\n"));
+        List<String> strings = List.of(input.split(REGEX_NEW_LINE));
         List<Packet> allPacks = new ArrayList<>();
         for (int i = 0; i < strings.size(); i = i + 3) {
             allPacks.add(new Packet(strings.get(i)));
