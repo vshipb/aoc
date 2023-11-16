@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.function.BiFunction;
+import java.util.function.Predicate;
 
 public class Day12 implements Puzzle {
     @Override
@@ -14,7 +15,8 @@ public class Day12 implements Puzzle {
 
     @Override
     public Integer part2(String input) {
-        return new Field(List.of(input.split(REGEX_NEW_LINE))).stepsToBottom();
+        Field field = new Field(List.of(input.split(REGEX_NEW_LINE)));
+        return field.steps(point -> field.charField[point.y][point.x] == 'a');
     }
 
     static class Field {
@@ -43,13 +45,13 @@ public class Day12 implements Puzzle {
             }
         }
 
-        int stepsToBottom() {
+        int steps(Predicate<Point> predicate) {
             List<Point> points = List.of(new Point(endPoint.x, endPoint.y));
             while (true) {
                 points = check(charField, stepField, points,
                         (Point point, Point neighbor) -> charField[point.y][point.x] - 1 <= charField[neighbor.y][neighbor.x]);
                 for (Point point : points) {
-                    if (charField[point.y][point.x] == 'a')
+                    if (predicate.test(point))
                         return stepField[point.y][point.x];
                 }
             }
