@@ -2,53 +2,37 @@ package io.qmbot.aoc.y2022;
 
 import io.qmbot.aoc.Puzzle;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.stream.IntStream;
+import org.jetbrains.annotations.NotNull;
 
 public class Day13 implements Puzzle {
     @Override
     public Integer part1(String input) {
-        List<String> strings = List.of(input.split("\n"));
-        Packet packetLeft;
-        Packet packetRight;
-        int trueResult = 0;
-        int numberOfPair = 0;
-        int result;
-        for (int i = 0; i < strings.size(); i = i + 3) {
-            numberOfPair++;
-            packetLeft = new Packet(strings.get(i));
-            packetRight = new Packet(strings.get(i + 1));
-            result = packetRight.compareTo(packetLeft);
-            if (result == 1) {
-                trueResult = trueResult + numberOfPair;
-            }
-        }
-        return trueResult;
+        List<Packet> allPacks = parseAllPacks(input);
+        return IntStream.range(1, allPacks.size())
+                .filter(i -> i % 2 == 1 && allPacks.get(i).compareTo(allPacks.get(i - 1)) > 0).map(i -> i / 2 + 1).sum();
     }
 
     @Override
     public Integer part2(String input) {
-        List<String> strings = List.of(input.split("\n"));
-        List<Packet> allPacks = new ArrayList<>();
-        for (int i = 0; i < strings.size(); i = i + 3) {
-            allPacks.add(new Packet(strings.get(i)));
-            allPacks.add(new Packet(strings.get(i + 1)));
-        }
+        List<Packet> allPacks = parseAllPacks(input);
         Packet marker2 = new Packet("[[2]]");
         Packet marker6 = new Packet("[[6]]");
-        int index2 = 0;
-        int index6 = 0;
-        allPacks.add(marker2);
-        allPacks.add(marker6);
+        allPacks.addAll(Arrays.asList(marker2, marker6));
         Collections.sort(allPacks);
-        for (int i = 0; i < allPacks.size(); i++) {
-            if (allPacks.get(i).equals(marker2)) {
-                index2 = i + 1;
-            } else if (allPacks.get(i).equals(marker6)) {
-                index6 = i + 1;
-            }
+        return (allPacks.indexOf(marker2) + 1) * (allPacks.indexOf(marker6) + 1);
+    }
+
+    static List<Packet> parseAllPacks(String input) {
+        List<String> strings = List.of(input.split(REGEX_NEW_LINE));
+        List<Packet> allPacks = new ArrayList<>();
+        for (int i = 0; i < strings.size(); i += 3) {
+            allPacks.addAll(strings.subList(i, i + 2).stream().map(Packet::new).toList());
         }
-        return index2 * index6;
+        return allPacks;
     }
 
     abstract static class Entry implements Comparable<Entry> {
@@ -65,11 +49,10 @@ public class Day13 implements Puzzle {
             int closePos = indexOfStart;
             int counter = 1;
             while (counter > 0) {
-                char c = string.charAt(++closePos);
-                if (c == '[') {
-                    counter++;
-                } else if (c == ']') {
-                    counter--;
+                switch (string.charAt(++closePos)) {
+                    case '[' -> counter++;
+                    case ']' -> counter--;
+                    default -> { }
                 }
             }
             return closePos;
@@ -77,8 +60,7 @@ public class Day13 implements Puzzle {
 
         Packet(String string) {
             List<Entry> packets = new ArrayList<>();
-            int size = string.length();
-            String packetStr = string.substring(1, size - 1);
+            String packetStr = string.substring(1, string.length() - 1);
             int position = 0;
             while (position < packetStr.length()) {
                 if (packetStr.charAt(position) == '[') {
@@ -87,20 +69,15 @@ public class Day13 implements Puzzle {
                     position = indexOfEndPack + 2;
                 } else {
                     int x = packetStr.indexOf(',', position);
-                    if (x == -1) {
-                        packets.add(new Number(Integer.parseInt(packetStr.substring(position))));
-                        break;
-                    } else {
-                        packets.add(new Number(Integer.parseInt(packetStr.substring(position, x))));
-                    }
-                    position = x + 1;
+                    packets.add(new Number(Integer.parseInt(x == -1 ? packetStr.substring(position) : packetStr.substring(position, x))));
+                    position = x == -1 ? packetStr.length() : x + 1;
                 }
             }
             this.packets = packets;
         }
 
         @Override
-        public int compareTo(Entry o) {
+        public int compareTo(@NotNull Entry o) {
             return o instanceof Packet ? compareEntries(((Packet) o).packets) : this.compareTo(new Packet(List.of(o)));
         }
 
@@ -121,7 +98,7 @@ public class Day13 implements Puzzle {
         }
 
         @Override
-        public int compareTo(Entry o) {
+        public int compareTo(@NotNull Entry o) {
             return o instanceof Number ? Integer.compare(number, ((Number) o).number) : -o.compareTo(this);
         }
     }
