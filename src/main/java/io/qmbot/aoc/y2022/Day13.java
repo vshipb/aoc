@@ -52,9 +52,7 @@ public class Day13 implements Puzzle {
                 switch (string.charAt(++closePos)) {
                     case '[' -> counter++;
                     case ']' -> counter--;
-                    default -> {
-                        continue;
-                    }
+                    default -> { }
                 }
             }
             return closePos;
