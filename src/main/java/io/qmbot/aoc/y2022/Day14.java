@@ -7,8 +7,8 @@ import java.util.List;
 import java.util.stream.IntStream;
 
 public class Day14 implements Puzzle {
-    static String PATH = " -> ";
-    static String COMMA = ",";
+    static final String PATH = " -> ";
+    static final String COMMA = ",";
 
     @Override
     public Integer part1(String input) {
@@ -28,9 +28,9 @@ public class Day14 implements Puzzle {
         }
         int fieldSize = maxX - minX + 3;
         int delete = maxX - fieldSize + 2;
-        int[][] field = new int[maxY + 2][fieldSize];
+        int[][] field = new int[maxY + 3][fieldSize];
         strings.forEach(str -> rocks(str, field, delete));
-        return result(field, 500 - delete) - 1;
+        return resultAfterFalling(field, 500 - delete) - 1;
     }
 
     @Override
@@ -47,10 +47,10 @@ public class Day14 implements Puzzle {
         int[][] field = new int[maxY + 3][1000];
         strings.forEach(str -> rocks(str, field, delete));
         Arrays.fill(field[field.length - 1], 2);
-        return result(field, 500 - delete);
+        return resultAfterFalling(field, 500 - delete);
     }
 
-    static int result(int[][] field, int startFallX) {
+    static int resultAfterFalling(int[][] field, int startFallX) {
         while (field[0][startFallX] == 0) {
             fall(field, startFallX);
         }
