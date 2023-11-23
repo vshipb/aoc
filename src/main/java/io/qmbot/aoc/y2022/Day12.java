@@ -3,125 +3,103 @@ package io.qmbot.aoc.y2022;
 import io.qmbot.aoc.Puzzle;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
+import java.util.function.BiFunction;
+import java.util.function.BiPredicate;
+import java.util.function.Predicate;
 
 public class Day12 implements Puzzle {
     @Override
     public Integer part1(String input) {
-        List<String> strings = List.of(input.split("\n"));
-        char[][] field = new char[strings.size()][strings.get(0).length()];
-        int[][] field1 = new int[strings.size()][strings.get(0).length()];
-        int startX = 0;
-        int startY = 0;
-        int endX = 0;
-        int endY = 0;
-        for (int j = 0; j < strings.size(); j++) {
-            String string = strings.get(j);
-            for (int i = 0; i < string.length(); i++) {
-                field[j][i] = string.charAt(i);
-                if (field[j][i] == 'S') {
-                    field[j][i] = 'a';
-                    startY = j;
-                    startX = i;
-                    field1[startY][startX] = 0;
-                }
-                if (field[j][i] == 'E') {
-                    field[j][i] = 'z';
-                    endX = i;
-                    endY = j;
-                }
-            }
-        }
-        List<Point> points = List.of(new Point(startX, startY));
-        int neighborCounts = 1;
-        while (neighborCounts != 0) {
-            points = newPointsCheck(field, field1, points);
-            neighborCounts = points.size();
-        }
-        return field1[endY][endX];
+        Field field = new Field(List.of(input.split(REGEX_NEW_LINE)));
+        return field.stepsToTop(field.startPoint,
+                (Point point, Point neighbor) -> field.charField[point.y][point.x] + 1 >= field.charField[neighbor.y][neighbor.x]);
     }
 
     @Override
     public Integer part2(String input) {
-        List<String> strings = List.of(input.split("\n"));
-        int stringSize = strings.size();
-        int stringSize1 = strings.get(0).length();
-        char[][] field = new char[stringSize][stringSize1];
-        int[][] field1 = new int[stringSize][stringSize1];
-        int endX = 0;
-        int endY = 0;
+        Field field = new Field(List.of(input.split(REGEX_NEW_LINE)));
+        return field.steps(point -> field.charField[point.y][point.x] == 'a');
+    }
+
+    static class Field {
+        char[][] charField;
+        int[][] stepField;
+        Point startPoint;
+        Point endPoint;
+
+        public Field(List<String> strings) {
+            int stringSize = strings.size();
+            int stringLength = strings.get(0).length();
+            this.charField = new char[stringSize][stringLength];
+            this.stepField = new int[stringSize][stringLength];
+            List<Point> startAndEndPoints = startAndEndPoints(strings, charField);
+            this.startPoint = startAndEndPoints.get(0);
+            this.endPoint = startAndEndPoints.get(1);
+        }
+
+        int stepsToTop(Point startPoint, BiPredicate<Point, Point> check) {
+            List<Point> points = List.of(new Point(startPoint.x, startPoint.y));
+            while (true) {
+                points = check(charField, stepField, points, check);
+                if (stepField[endPoint.y][endPoint.x] > 0)
+                    return stepField[endPoint.y][endPoint.x];
+            }
+        }
+
+        int steps(Predicate<Point> predicate) {
+            List<Point> points = List.of(new Point(endPoint.x, endPoint.y));
+            while (true) {
+                points = check(charField, stepField, points,
+                        (Point point, Point neighbor) -> charField[point.y][point.x] - 1 <= charField[neighbor.y][neighbor.x]);
+                for (Point point : points) {
+                    if (charField[point.y][point.x] == 'a')
+                        return stepField[point.y][point.x];
+                }
+            }
+        }
+    }
+
+    static List<Point> startAndEndPoints(List<String> strings, char[][] charField) {
+        Point startPoint = null;
+        Point endPoint = null;
         for (int j = 0; j < strings.size(); j++) {
             String string = strings.get(j);
             for (int i = 0; i < string.length(); i++) {
-                field[j][i] = string.charAt(i);
-                if (field[j][i] == 'S') {
-                    field[j][i] = 'a';
-                }
-                if (field[j][i] == 'E') {
-                    field[j][i] = 'z';
-                    endX = i;
-                    endY = j;
+                char currentChar = string.charAt(i);
+                charField[j][i] = currentChar;
+                if (currentChar == 'S') {
+                    charField[j][i] = 'a';
+                    startPoint = new Point(i, j);
+                } else if (currentChar == 'E') {
+                    charField[j][i] = 'z';
+                    endPoint = new Point(i, j);
                 }
             }
         }
-        List<Point> points = List.of(new Point(endX, endY));
-        while (field[points.get(0).y][points.get(0).x] != 'a') {
-            points = newPointsCheck1(field, field1, points);
-        }
-        return field1[points.get(0).y][points.get(0).x];
+        return List.of(Objects.requireNonNull(startPoint), Objects.requireNonNull(endPoint));
     }
 
     record Point(int x, int y) {
-
         List<Point> neighbors(int sizeX, int sizeY) {
             List<Point> neighbors = new ArrayList<>();
-            if (x > 0) {
-                neighbors.add(new Point(x - 1, y));
-            }
-            if (x < sizeX - 1) {
-                neighbors.add(new Point(x + 1, y));
-            }
-            if (y > 0) {
-                neighbors.add(new Point(x, y - 1));
-            }
-            if (y < sizeY - 1) {
-                neighbors.add(new Point(x, y + 1));
-            }
+            if (x > 0) neighbors.add(new Point(x - 1, y));
+            if (x < sizeX - 1) neighbors.add(new Point(x + 1, y));
+            if (y > 0) neighbors.add(new Point(x, y - 1));
+            if (y < sizeY - 1) neighbors.add(new Point(x, y + 1));
             return neighbors;
         }
 
     }
 
-    private static List<Point> newPointsCheck(char[][] field, int[][] field1, List<Point> nowPoints) {
+    private static List<Point> check(char[][] charField, int[][] stepField, List<Point> nowPoints,
+                                     BiPredicate<Point, Point> check) {
         List<Point> newPoints = new ArrayList<>();
-        List<Point> neighbors1;
         for (Point point : nowPoints) {
-            neighbors1 = point.neighbors(field[0].length, field.length);
-            for (Point neighbor : neighbors1) {
-                if (field[point.y][point.x] + 1 >= field[neighbor.y][neighbor.x]
-                        && field1[neighbor.y][neighbor.x] == 0) {
-                    field1[neighbor.y][neighbor.x] = field1[point.y][point.x] + 1;
+            for (Point neighbor : point.neighbors(charField[0].length, charField.length)) {
+                if (check.test(point, neighbor) && stepField[neighbor.y][neighbor.x] == 0) {
+                    stepField[neighbor.y][neighbor.x] = stepField[point.y][point.x] + 1;
                     newPoints.add(neighbor);
-                }
-            }
-        }
-        return newPoints;
-    }
-
-    private static List<Point> newPointsCheck1(char[][] field, int[][] field1, List<Point> nowPoints) {
-        List<Point> newPoints = new ArrayList<>();
-        List<Point> neighbors1;
-        for (Point point : nowPoints) {
-            neighbors1 = point.neighbors(field[0].length, field.length);
-            for (Point neighbor : neighbors1) {
-                if (field[point.y][point.x] - 1 <= field[neighbor.y][neighbor.x]
-                        && field1[neighbor.y][neighbor.x] == 0) {
-                    field1[neighbor.y][neighbor.x] = field1[point.y][point.x] + 1;
-                    newPoints.add(neighbor);
-                    if (field[neighbor.y][neighbor.x] == 'a') {
-                        newPoints.clear();
-                        newPoints.add(neighbor);
-                        return newPoints;
-                    }
                 }
             }
         }
