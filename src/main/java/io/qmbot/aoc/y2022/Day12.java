@@ -5,12 +5,15 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.function.BiFunction;
+import java.util.function.BiPredicate;
 import java.util.function.Predicate;
 
 public class Day12 implements Puzzle {
     @Override
     public Integer part1(String input) {
-        return new Field(List.of(input.split(REGEX_NEW_LINE))).stepsToTop();
+        Field field = new Field(List.of(input.split(REGEX_NEW_LINE)));
+        return field.stepsToTop(field.startPoint,
+                (Point point, Point neighbor) -> field.charField[point.y][point.x] + 1 >= field.charField[neighbor.y][neighbor.x]);
     }
 
     @Override
@@ -35,11 +38,10 @@ public class Day12 implements Puzzle {
             this.endPoint = startAndEndPoints.get(1);
         }
 
-        int stepsToTop() {
+        int stepsToTop(Point startPoint, BiPredicate<Point, Point> check) {
             List<Point> points = List.of(new Point(startPoint.x, startPoint.y));
             while (true) {
-                points = check(charField, stepField, points,
-                        (Point point, Point neighbor) -> charField[point.y][point.x] + 1 >= charField[neighbor.y][neighbor.x]);
+                points = check(charField, stepField, points, check);
                 if (stepField[endPoint.y][endPoint.x] > 0)
                     return stepField[endPoint.y][endPoint.x];
             }
@@ -51,7 +53,7 @@ public class Day12 implements Puzzle {
                 points = check(charField, stepField, points,
                         (Point point, Point neighbor) -> charField[point.y][point.x] - 1 <= charField[neighbor.y][neighbor.x]);
                 for (Point point : points) {
-                    if (predicate.test(point))
+                    if (charField[point.y][point.x] == 'a')
                         return stepField[point.y][point.x];
                 }
             }
@@ -91,11 +93,11 @@ public class Day12 implements Puzzle {
     }
 
     private static List<Point> check(char[][] charField, int[][] stepField, List<Point> nowPoints,
-                                     BiFunction<Point, Point, Boolean> check) {
+                                     BiPredicate<Point, Point> check) {
         List<Point> newPoints = new ArrayList<>();
         for (Point point : nowPoints) {
             for (Point neighbor : point.neighbors(charField[0].length, charField.length)) {
-                if (check.apply(point, neighbor) && stepField[neighbor.y][neighbor.x] == 0) {
+                if (check.test(point, neighbor) && stepField[neighbor.y][neighbor.x] == 0) {
                     stepField[neighbor.y][neighbor.x] = stepField[point.y][point.x] + 1;
                     newPoints.add(neighbor);
                 }
