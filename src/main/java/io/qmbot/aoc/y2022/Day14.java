@@ -13,7 +13,7 @@ public class Day14 implements Puzzle {
     @Override
     public Integer part1(String input) {
         List<String> strings = List.of(input.split(REGEX_NEW_LINE));
-        Parameters parameters = new Parameters(strings);
+        Parameters parameters = Parameters.pase(strings);
         int[][] field = new int[parameters.maxY + 3][parameters.fieldSize];
         strings.forEach(str -> rocks(str, field, parameters.delete));
         return resultAfterFalling(field, 500 - parameters.delete) - 1;
@@ -22,7 +22,7 @@ public class Day14 implements Puzzle {
     @Override
     public Integer part2(String input) {
         List<String> strings = List.of(input.split(REGEX_NEW_LINE));
-        Parameters parameters = new Parameters(strings);
+        Parameters parameters = Parameters.pase(strings);
         parameters.delete = 0;
         int[][] field = new int[parameters.maxY + 3][1000];
         strings.forEach(str -> rocks(str, field, parameters.delete));
@@ -35,21 +35,29 @@ public class Day14 implements Puzzle {
         int delete;
         int maxY = 0;
 
-        public Parameters(List<String> strings) {
+        public static Parameters pase(List<String> strings) {
             int maxX = 0;
             int minX = 1000;
+            int maxY = 0;
             for (String string : strings) {
                 for (String s : string.split(PATH)) {
                     String[] coordinates = s.split(COMMA);
                     int x = Integer.parseInt(coordinates[0]);
                     int y = Integer.parseInt(coordinates[1]);
-                    if (maxY < y) this.maxY = y;
+                    if (maxY < y) maxY = y;
                     if (maxX < x) maxX = x;
                     if (minX > x) minX = x;
                 }
             }
-            this.fieldSize = maxX - minX + 3;
-            this.delete = maxX - fieldSize + 2;
+            int fieldSize = maxX - minX + 3;
+            int delete = maxX - fieldSize + 2;
+            return new Parameters(fieldSize, delete, maxY);
+        }
+
+        private Parameters(int fieldSize, int delete, int maxY) {
+            this.fieldSize = fieldSize;
+            this.delete = delete;
+            this.maxY = maxY;
         }
     }
 
