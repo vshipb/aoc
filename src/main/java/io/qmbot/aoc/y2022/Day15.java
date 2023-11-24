@@ -19,7 +19,32 @@ public class Day15 implements Puzzle {
     @Override
     public Long part2(String input) {
         Field field = new Field(List.of(input.split(REGEX_NEW_LINE)), 0);
-        return field.resultPart2(4000000, 0);
+        int max = 4000000;
+        int seekingX = 0;
+        List<Segment> segments = new ArrayList<>();
+        Segment segment;
+        Segment testing = new Segment(0, 0);
+        Segment falseField = new Segment(0, max);
+        for (int y = 0; y < max; y++) {
+            segments.clear();
+            segment = new Segment(0, 0);
+            for (Point point : field.sensors) {
+                Segment test = notFreeSpace(y, point, field.beacons.get(field.sensors.indexOf(point)), max);
+                if (!test.equals(testing)) {
+                    segments.add(test);
+                }
+            }
+            Collections.sort(segments);
+            for (Segment point : segments) {
+                segment = fuse(segment, point);
+                if (segment.equals(falseField)) break;
+                if (segment.equals(testing)) {
+                    return seekingX * 4000000L + y;
+                }
+                seekingX = segment.second + 1;
+            }
+        }
+        return 0L;
     }
 
     static class Field {
@@ -52,33 +77,6 @@ public class Day15 implements Puzzle {
 
         void sensorsAreaAtString(int seekingY) {
             sensors.forEach(point -> sensorAreaAtString(seekingField, seekingY, point, beacons.get(sensors.indexOf(point))));
-        }
-
-        long resultPart2(int max, int seekingX) {
-            List<Segment> segments = new ArrayList<>();
-            Segment segment;
-            Segment testing = new Segment(0, 0);
-            Segment falseField = new Segment(0, max);
-            for (int y = 0; y < max; y++) {
-                segments.clear();
-                segment = new Segment(0, 0);
-                for (Point point : sensors) {
-                    Segment test = notFreeSpace(y, point, beacons.get(sensors.indexOf(point)), max);
-                    if (!test.equals(testing)) {
-                        segments.add(test);
-                    }
-                }
-                Collections.sort(segments);
-                for (Segment point : segments) {
-                    segment = fuse(segment, point);
-                    if (segment.equals(falseField)) break;
-                    if (segment.equals(testing)) {
-                        return seekingX * 4000000L + y;
-                    }
-                    seekingX = segment.second + 1;
-                }
-            }
-            return 0L;
         }
     }
 
